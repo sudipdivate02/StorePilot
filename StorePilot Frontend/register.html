@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Register your shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background-color:var(--ivory);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(245,166,35,0.045) 0%, transparent 45%),
+    radial-gradient(circle at 88% 82%, rgba(15,61,46,0.035) 0%, transparent 50%),
+    radial-gradient(rgba(15,61,46,0.025) 1px, transparent 1px);
+  background-size: auto, auto, 24px 24px;
+  min-height:100vh;
+  display:flex;
+  overflow-x:hidden;
+}
+
+.page{
+  display:flex;
+  width:100vw;
+  min-height:100vh;
+  animation: pageReveal 0.8s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes pageReveal{
+  0%  {opacity:0;transform:translateX(-10px);}
+  100%{opacity:1;transform:translateX(0);}
+}
+
+/* ─────────────────────────────
+   LEFT PANEL
+───────────────────────────── */
+.left{
+  width:45%;max-width:600px;min-width:440px;flex-shrink:0;
+  background: linear-gradient(135deg, var(--sp9) 0%, var(--sp8) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:64px 48px;position:relative;overflow:hidden;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.left::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(255,255,255,0.035) 1.2px, transparent 1.2px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+.left::after{
+  content:'';position:absolute;bottom:-50px;right:-50px;
+  width:320px;height:320px;border-radius:50%;
+  background: radial-gradient(circle, transparent 40%, rgba(245,166,35,0.04) 100%);
+  border: 2px dashed rgba(245,166,35,0.08);
+  pointer-events:none;
+}
+.dec-ring{
+  position:absolute;top:-80px;left:-80px;width:280px;height:280px;
+  border-radius:40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: linear-gradient(45deg, rgba(30,138,99,0.06), transparent);
+  animation: fluidRotate 20s linear infinite;
+  pointer-events:none;
+}
+@keyframes fluidRotate{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+.left-inner{position:relative;z-index:1;text-align:center;width:100%;}
+
+.logo-pill{
+  display:inline-flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px;padding:12px 24px 12px 12px;
+  margin-bottom:40px;backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(12,51,38,0.2);
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+}
+.logo-img-box{
+  width:54px;height:54px;background: rgba(255,255,255,0.04);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.logo-img-box img{width:46px;height:46px;object-fit:contain;display:block;}
+.pill-text{text-align:left;}
+.pill-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1;}
+.pill-name span{color:var(--g4);}
+.pill-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:4px;letter-spacing:0.06em;text-transform:uppercase;}
+
+.left-hl{
+  font-size:28px;font-weight:800;color:#fff;line-height:1.3;letter-spacing:-0.5px;
+  margin-bottom:12px;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+}
+.left-hl em{color:var(--g4);font-style:normal;}
+.left-body{
+  font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:44px;
+  max-width:340px;margin-left:auto;margin-right:auto;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.3s both;
+}
+
+/* journey steps list — replaces feature pills, tells the setup story */
+.journey{display:flex;flex-direction:column;gap:0;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+  text-align:left;
+}
+.j-item{display:flex;gap:14px;position:relative;padding-bottom:28px;}
+.j-item:last-child{padding-bottom:0;}
+.j-rail{
+  position:relative;width:36px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+}
+.j-dot{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;z-index:1;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.j-dot.active{background:var(--g5);color:var(--sp9);box-shadow:0 4px 14px rgba(245,166,35,0.3);}
+.j-dot.pending{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:0.5px solid rgba(255,255,255,0.1);}
+.j-dot.done{background:rgba(245,166,35,0.18);color:var(--g4);border:0.5px solid rgba(245,166,35,0.3);}
+.j-line{
+  width:1.5px;flex:1;background:rgba(255,255,255,0.1);
+  margin-top:4px;transition:background 0.3s;
+}
+.j-line.filled{background:rgba(245,166,35,0.4);}
+.j-text{padding-top:4px;}
+.j-t{font-size:13.5px;font-weight:700;color:rgba(255,255,255,0.55);line-height:1.2;transition:color 0.3s;}
+.j-t.active{color:#fff;}
+.j-d{font-size:11.5px;color:rgba(255,255,255,0.32);margin-top:3px;line-height:1.5;}
+
+@keyframes fadeUp{0%{opacity:0;transform:translateY(12px);}100%{opacity:1;transform:translateY(0);}}
+
+/* ─────────────────────────────
+   RIGHT PANEL
+───────────────────────────── */
+.right{
+  flex:1;background-color:var(--ivory);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:64px;position:relative;
+}
+.right::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle at 85% 15%, rgba(245,166,35,0.04) 0%, transparent 40%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size: auto, 32px 32px;
+  pointer-events: none;
+}
+
+.form-box{
+  width:100%;max-width:460px;background:#ffffff;
+  padding:44px 40px;border-radius:24px;
+  border:1px solid rgba(15,61,46,0.06);
+  box-shadow:0 20px 50px rgba(12,51,38,0.04),0 4px 12px rgba(12,51,38,0.02);
+  position:relative;z-index:2;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.15s both;
+}
+
+/* progress bar */
+.progress-row{display:flex;align-items:center;gap:8px;margin-bottom:28px;}
+.p-seg{flex:1;height:5px;border-radius:3px;background:#EEEEE8;overflow:hidden;}
+.p-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--g5),var(--g4));border-radius:3px;transition:width 0.5s cubic-bezier(0.22,1,0.36,1);}
+.p-label{font-size:11px;font-weight:800;color:var(--sp5);white-space:nowrap;letter-spacing:0.04em;}
+
+.eyebrow{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:800;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--sp5);margin-bottom:10px;
+}
+.eyebrow-line{width:24px;height:3px;border-radius:2px;background:var(--g5);}
+
+.form-h{
+  font-size:30px;font-weight:900;color:var(--sp9);letter-spacing:-0.7px;
+  margin-bottom:8px;line-height:1.15;
+}
+.form-s{font-size:13.5px;color:var(--txt2);margin-bottom:30px;line-height:1.6;}
+
+/* ── steps ── */
+.step{display:none;}
+.step.active{display:block;animation: stepIn 0.4s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes stepIn{0%{opacity:0;transform:translateX(14px);}100%{opacity:1;transform:translateX(0);}}
+
+.field{margin-bottom:18px;}
+.f-label{display:block;font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;}
+.f-wrap{position:relative;display:flex;align-items:center;}
+.f-icon{position:absolute;left:16px;color:var(--txt2);font-size:18px;pointer-events:none;}
+.f-prefix{position:absolute;left:46px;font-size:14px;font-weight:700;color:#9CA3AF;pointer-events:none;letter-spacing:0.01em;}
+.f-wrap input,.f-wrap select{
+  width:100%;height:52px;border:1.5px solid #E5E7EB;border-radius:14px;
+  padding:0 16px 0 48px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:600;color:var(--txt);
+  background:#FAFAFA;outline:none;appearance:none;
+  transition:border-color 0.18s,background 0.18s,box-shadow 0.18s;
+}
+.phone-in{padding-left:86px!important;}
+.f-wrap input::placeholder{color:#C5CAD3;font-size:13.5px;font-weight:400;}
+.f-wrap input:focus,.f-wrap select:focus{
+  border-color:var(--sp5);background:#fff;box-shadow:0 0 0 4px rgba(30,138,99,0.08);
+}
+.f-wrap input.err{border-color:#FCA5A5;background:#FFF9F9;}
+.f-eye{
+  position:absolute;right:16px;color:var(--txt2);font-size:18px;
+  cursor:pointer;background:none;border:none;padding:0;
+  display:flex;align-items:center;transition:color 0.15s;
+}
+.f-eye:hover{color:var(--sp7);}
+.f-hint{font-size:11.5px;color:#9CA3AF;margin-top:6px;}
+
+/* password strength meter */
+.pw-meter{display:flex;gap:4px;margin-top:10px;}
+.pw-seg{flex:1;height:4px;border-radius:2px;background:#EEEEE8;transition:background 0.25s;}
+.pw-seg.weak{background:#F09595;}
+.pw-seg.medium{background:#F5A623;}
+.pw-seg.strong{background:#1E8A63;}
+.pw-label{font-size:11px;font-weight:700;margin-top:7px;color:#9CA3AF;}
+.pw-label.weak{color:#DC2626;}
+.pw-label.medium{color:#D97706;}
+.pw-label.strong{color:#1E8A63;}
+
+/* step nav buttons */
+.nav-row{display:flex;gap:12px;margin-top:8px;}
+.btn-back{
+  width:54px;height:54px;border-radius:14px;flex-shrink:0;
+  background:#F4F3EE;color:var(--sp8);border:1.5px solid #E5E7EB;
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  cursor:pointer;transition:background 0.15s,border-color 0.15s;
+}
+.btn-back:hover{background:#ECEAE2;border-color:#D5D5CC;}
+
+.btn-go{
+  flex:1;height:54px;border-radius:14px;
+  background:var(--sp8);color:#fff;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  letter-spacing:0.02em;box-shadow:0 6px 20px rgba(15,61,46,0.22);
+  position:relative;overflow:hidden;
+  transition:background 0.18s,transform 0.12s,box-shadow 0.18s;
+}
+.btn-go::after{
+  content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
+  transform:skewX(-18deg);transition:none;
+}
+.btn-go:hover{background:var(--sp7);box-shadow:0 8px 28px rgba(15,61,46,0.28);}
+.btn-go:hover::after{left:150%;transition:left 0.55s ease;}
+.btn-go:active{transform:scale(0.98);}
+.btn-go.loading{background:var(--sp7);pointer-events:none;}
+.spinner{
+  width:20px;height:20px;border:2.5px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;
+}
+.btn-go.loading .spinner{display:block;}
+.btn-go.loading .btn-txt{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.or-row{display:flex;align-items:center;gap:12px;margin:22px 0 18px;}
+.or-line{flex:1;height:1px;background:#F0F0F0;}
+.or-txt{font-size:11px;color:#C8CDD5;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+
+.login-row{text-align:center;font-size:13.5px;color:var(--txt2);}
+.login-a{color:var(--sp5);font-weight:800;text-decoration:none;}
+.login-a:hover{color:var(--sp7);text-decoration:underline;}
+
+.err-box{
+  display:none;align-items:center;gap:10px;
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:12px 16px;
+  margin-bottom:20px;font-size:13.5px;color:#DC2626;font-weight:700;
+}
+.err-box.show{display:flex;}
+
+/* success step */
+.success-box{display:none;text-align:center;padding:20px 0 4px;}
+.success-box.active{display:block;animation: stepIn 0.4s cubic-bezier(0.22,1,0.36,1) both;}
+.success-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--g0);border:2px solid rgba(245,166,35,0.35);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:32px;color:var(--g5);
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+}
+@keyframes popIn{0%{opacity:0;transform:scale(0.5);}100%{opacity:1;transform:scale(1);}}
+.success-h{font-size:24px;font-weight:900;color:var(--sp9);margin-bottom:8px;}
+.success-s{font-size:13.5px;color:var(--txt2);line-height:1.6;margin-bottom:28px;}
+
+@media(max-width:900px){
+  .left{width:40%;min-width:360px;padding:44px 32px;}
+  .left-hl{font-size:24px;}
+  .left-body{font-size:13px;margin-bottom:32px;}
+  .logo-pill{margin-bottom:32px;}
+}
+@media(max-width:768px){
+  body{overflow-y:auto;}
+  .page{flex-direction:column;min-height:100vh;width:100%;}
+  .left{width:100%;max-width:100%;min-width:100%;padding:44px 24px 36px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .journey,.left-body{display:none;}
+  .right{padding:32px 16px;flex:none;min-height:auto;}
+  .form-box{padding:32px 24px;box-shadow:none;border:none;background:transparent;}
+}
+</style>
+</head>
+<body>
+
+<div class="page" role="main">
+
+  <div class="left">
+    <div class="dec-ring"></div>
+    <div class="left-inner">
+
+      <div class="logo-pill">
+        <div class="logo-img-box">
+          <img src="SPlogo.png" alt="StorePilot Logo">
+        </div>
+        <div class="pill-text">
+          <div class="pill-name">Store<span>Pilot</span></div>
+          <div class="pill-sub">Kirana Business OS</div>
+        </div>
+      </div>
+
+      <div class="left-hl">Your shop deserves<br><em>a smarter start.</em></div>
+      <div class="left-body">Setup takes under two minutes. No paperwork, no jargon — just your shop's basic details.</div>
+
+      <div class="journey">
+        <div class="j-item">
+          <div class="j-rail">
+            <div class="j-dot active" id="jDot1">1</div>
+            <div class="j-line" id="jLine1"></div>
+          </div>
+          <div class="j-text">
+            <div class="j-t active" id="jText1">Shop and owner details</div>
+            <div class="j-d">Tell us your shop name and contact</div>
+          </div>
+        </div>
+        <div class="j-item">
+          <div class="j-rail">
+            <div class="j-dot pending" id="jDot2">2</div>
+          </div>
+          <div class="j-text">
+            <div class="j-t" id="jText2">Set your password</div>
+            <div class="j-d">Secure your shop's account</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="right">
+
+    <div class="form-box">
+
+      <div class="progress-row" id="progressRow">
+        <div class="p-seg"><div class="p-fill" id="pFill" style="width:50%;"></div></div>
+        <div class="p-label" id="pLabel">Step 1 of 2</div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step active" id="step1">
+        <div class="eyebrow"><div class="eyebrow-line"></div> Get started</div>
+        <div class="form-h">Register your shop</div>
+        <div class="form-s">Let's start with your shop name and contact number.</div>
+
+        <div class="err-box" id="errBox1" role="alert">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>
+          <span id="errTxt1">Please fill all the fields correctly.</span>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="shopName">Shop name</label>
+          <div class="f-wrap">
+            <i class="ti ti-building-store f-icon" aria-hidden="true"></i>
+            <input type="text" id="shopName" placeholder="e.g. Sharma General Store">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="ownerName">Owner name</label>
+          <div class="f-wrap">
+            <i class="ti ti-user f-icon" aria-hidden="true"></i>
+            <input type="text" id="ownerName" placeholder="Your full name">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="phone">Phone number</label>
+          <div class="f-wrap">
+            <i class="ti ti-phone f-icon" aria-hidden="true"></i>
+            <span class="f-prefix">+91</span>
+            <input type="tel" id="phone" class="phone-in"
+              placeholder="98765 43210" maxlength="10" inputmode="numeric" autocomplete="tel">
+          </div>
+          <div class="f-hint">We will send an OTP here to verify your shop.</div>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn-go" id="toStep2Btn">
+            <span class="btn-txt">Continue&nbsp; <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step2">
+        <div class="eyebrow"><div class="eyebrow-line"></div> Almost done</div>
+        <div class="form-h">Set a password</div>
+        <div class="form-s">One last step to secure your shop's account.</div>
+
+        <div class="err-box" id="errBox2" role="alert">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>
+          <span id="errTxt2">Please check your password fields.</span>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="password">Password</label>
+          <div class="f-wrap">
+            <i class="ti ti-lock f-icon" aria-hidden="true"></i>
+            <input type="password" id="password" placeholder="Create a password" autocomplete="new-password">
+            <button type="button" class="f-eye" id="eyeBtn1" aria-label="Show or hide password">
+              <i class="ti ti-eye" id="eyeIco1" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="pw-meter">
+            <div class="pw-seg" id="pwSeg1"></div>
+            <div class="pw-seg" id="pwSeg2"></div>
+            <div class="pw-seg" id="pwSeg3"></div>
+          </div>
+          <div class="pw-label" id="pwLabel">At least 6 characters</div>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="confirmPassword">Confirm password</label>
+          <div class="f-wrap">
+            <i class="ti ti-lock-check f-icon" aria-hidden="true"></i>
+            <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+            <button type="button" class="f-eye" id="eyeBtn2" aria-label="Show or hide password">
+              <i class="ti ti-eye" id="eyeIco2" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn-back" id="backBtn" aria-label="Go back">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i>
+          </button>
+          <button type="submit" class="btn-go" id="registerBtn" form="registerForm">
+            <div class="spinner" aria-hidden="true"></div>
+            <span class="btn-txt">
+              <i class="ti ti-rocket" aria-hidden="true"></i>&nbsp; Create my shop account
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUCCESS STEP -->
+      <div class="success-box" id="successBox">
+        <div class="success-icon"><i class="ti ti-check" aria-hidden="true"></i></div>
+        <div class="success-h">Shop registered!</div>
+        <div class="success-s">Your StorePilot account is ready.<br>Let's set up your inventory next.</div>
+        <button type="button" class="btn-go" id="goDashboardBtn" style="width:100%;">
+          <span class="btn-txt"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>&nbsp; Go to dashboard</span>
+        </button>
+      </div>
+
+      <form id="registerForm" novalidate style="display:none;"></form>
+
+      <div id="bottomLinks">
+        <div class="or-row">
+          <div class="or-line"></div>
+          <div class="or-txt">Already with us?</div>
+          <div class="or-line"></div>
+        </div>
+        <div class="login-row">
+          Have an account already? &nbsp;<a href="login.html" class="login-a">Login here &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const successBox = document.getElementById('successBox');
+  const progressRow = document.getElementById('progressRow');
+  const bottomLinks = document.getElementById('bottomLinks');
+  const pFill = document.getElementById('pFill');
+  const pLabel = document.getElementById('pLabel');
+
+  const jDot1 = document.getElementById('jDot1');
+  const jDot2 = document.getElementById('jDot2');
+  const jLine1 = document.getElementById('jLine1');
+  const jText1 = document.getElementById('jText1');
+  const jText2 = document.getElementById('jText2');
+
+  const shopName = document.getElementById('shopName');
+  const ownerName = document.getElementById('ownerName');
+  const phone = document.getElementById('phone');
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirmPassword');
+
+  const errBox1 = document.getElementById('errBox1');
+  const errTxt1 = document.getElementById('errTxt1');
+  const errBox2 = document.getElementById('errBox2');
+  const errTxt2 = document.getElementById('errTxt2');
+
+  phone.addEventListener('input', () => {
+    phone.value = phone.value.replace(/\D/g,'').slice(0,10);
+    phone.classList.remove('err');
+  });
+  [shopName, ownerName].forEach(el => el.addEventListener('input', () => el.classList.remove('err')));
+
+  function showErr1(msg){ errTxt1.textContent = msg; errBox1.classList.add('show'); }
+  function showErr2(msg){ errTxt2.textContent = msg; errBox2.classList.add('show'); }
+
+  document.getElementById('toStep2Btn').addEventListener('click', () => {
+    errBox1.classList.remove('show');
+    let ok = true;
+    if(!shopName.value.trim()){ shopName.classList.add('err'); ok=false; }
+    if(!ownerName.value.trim()){ ownerName.classList.add('err'); ok=false; }
+    if(!phone.value.trim() || phone.value.length < 10){ phone.classList.add('err'); ok=false; }
+    if(!ok){ showErr1('Please fill all the fields correctly.'); return; }
+
+    step1.classList.remove('active');
+    step2.classList.add('active');
+    pFill.style.width = '100%';
+    pLabel.textContent = 'Step 2 of 2';
+
+    jDot1.classList.remove('active'); jDot1.classList.add('done');
+    jDot1.innerHTML = '<i class="ti ti-check" aria-hidden="true" style="font-size:16px;"></i>';
+    jLine1.classList.add('filled');
+    jText1.classList.remove('active');
+    jDot2.classList.remove('pending'); jDot2.classList.add('active');
+    jText2.classList.add('active');
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    step2.classList.remove('active');
+    step1.classList.add('active');
+    pFill.style.width = '50%';
+    pLabel.textContent = 'Step 1 of 2';
+
+    jDot1.classList.remove('done'); jDot1.classList.add('active');
+    jDot1.innerHTML = '1';
+    jLine1.classList.remove('filled');
+    jText1.classList.add('active');
+    jDot2.classList.remove('active'); jDot2.classList.add('pending');
+    jText2.classList.remove('active');
+  });
+
+  function pwStrength(val){
+    let score = 0;
+    if(val.length >= 6) score++;
+    if(val.length >= 10) score++;
+    if(/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
+    if(/[^a-zA-Z0-9]/.test(val)) score++;
+    return score;
+  }
+
+  const pwSeg1 = document.getElementById('pwSeg1');
+  const pwSeg2 = document.getElementById('pwSeg2');
+  const pwSeg3 = document.getElementById('pwSeg3');
+  const pwLabel = document.getElementById('pwLabel');
+
+  password.addEventListener('input', () => {
+    password.classList.remove('err');
+    const val = password.value;
+    const score = pwStrength(val);
+    [pwSeg1, pwSeg2, pwSeg3].forEach(s => s.className = 'pw-seg');
+    if(val.length === 0){
+      pwLabel.textContent = 'At least 6 characters';
+      pwLabel.className = 'pw-label';
+      return;
+    }
+    if(score <= 1){
+      pwSeg1.classList.add('weak');
+      pwLabel.textContent = 'Weak password';
+      pwLabel.className = 'pw-label weak';
+    } else if(score <= 2){
+      pwSeg1.classList.add('medium'); pwSeg2.classList.add('medium');
+      pwLabel.textContent = 'Medium strength';
+      pwLabel.className = 'pw-label medium';
+    } else {
+      pwSeg1.classList.add('strong'); pwSeg2.classList.add('strong'); pwSeg3.classList.add('strong');
+      pwLabel.textContent = 'Strong password';
+      pwLabel.className = 'pw-label strong';
+    }
+  });
+
+  confirmPassword.addEventListener('input', () => confirmPassword.classList.remove('err'));
+
+  [['eyeBtn1','password','eyeIco1'], ['eyeBtn2','confirmPassword','eyeIco2']].forEach(([btnId, inputId, icoId]) => {
+    document.getElementById(btnId).addEventListener('click', () => {
+      const inp = document.getElementById(inputId);
+      const ico = document.getElementById(icoId);
+      const hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      ico.className = hide ? 'ti ti-eye-off' : 'ti ti-eye';
+    });
+  });
+
+  document.getElementById('registerBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    errBox2.classList.remove('show');
+    let ok = true;
+    if(!password.value || password.value.length < 6){ password.classList.add('err'); ok=false; }
+    if(password.value !== confirmPassword.value || !confirmPassword.value){ confirmPassword.classList.add('err'); ok=false; }
+    if(!ok){ showErr2('Please check your password fields.'); return; }
+
+    const btn = document.getElementById('registerBtn');
+    btn.classList.add('loading');
+
+    try {
+      // Step 1 — Register the store + owner account
+      const res = await fetch('http://127.0.0.1:8000/api/v1/auth/register-store', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          store_name: shopName.value.trim(),
+          owner_name: ownerName.value.trim(),
+          phone: phone.value.trim(),
+          password: password.value,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        btn.classList.remove('loading');
+        showErr2(data.detail || 'Registration failed. Please try again.');
+        return;
+      }
+
+      // Step 2 — Auto-login to get token
+      const loginRes = await fetch('http://127.0.0.1:8000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone.value.trim(), password: password.value }),
+      });
+
+      const loginData = await loginRes.json();
+
+      if (loginRes.ok) {
+        localStorage.setItem('token', loginData.access_token);
+        localStorage.setItem('role', loginData.role || '');
+        localStorage.setItem('store_id', loginData.store_id || '');
+      }
+
+      // Step 3 — Show success screen
+      btn.classList.remove('loading');
+      step2.classList.remove('active');
+      progressRow.style.display = 'none';
+      bottomLinks.style.display = 'none';
+      successBox.classList.add('active');
+
+    } catch (err) {
+      btn.classList.remove('loading');
+      showErr2('Could not connect to server. Make sure the backend is running.');
+    }
+  });
+
+  document.getElementById('goDashboardBtn').addEventListener('click', () => {
+    window.location.href = 'dashboard.html';
+  });
+</script>
+</body>
+</html>

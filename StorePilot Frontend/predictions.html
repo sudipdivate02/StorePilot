@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Predictions</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+  --red0:#FEF2F2;--red5:#DC2626;
+  --green5:#16A34A;
+  --amber0:#FFFBEB;--amber5:#D97706;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background-color:var(--ivory);
+  background-image:
+    radial-gradient(circle at 95% 0%, rgba(245,166,35,0.04) 0%, transparent 40%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size: auto, 24px 24px;
+  min-height:100vh;
+  color:var(--txt);
+}
+
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;}
+
+/* App Shell */
+.shell{display:flex;min-height:100vh;}
+
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--sp8);
+  display:flex;flex-direction:column;
+  padding:24px 16px;
+  position:sticky;top:0;height:100vh;
+}
+
+.sb-logo{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 10px 28px;
+}
+.sb-logo-box{
+  width:40px;height:40px;border-radius:11px;
+  background:#1E8A63;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.sb-logo-box img{width:32px;height:32px;object-fit:contain;display:block;}
+.sb-logo-text{}
+.sb-logo-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1;}
+.sb-logo-name span{color:var(--g4);}
+.sb-logo-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+
+.sb-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.sb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 12px;border-radius:11px;
+  font-size:13.5px;font-weight:600;
+  color:rgba(255,255,255,0.55);
+  transition:background 0.15s,color 0.15s;
+  cursor:pointer;position:relative;
+}
+.sb-item i{font-size:18px;flex-shrink:0;width:18px;text-align:center;}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(245,166,35,0.13);color:#fff;}
+.sb-item.active i{color:var(--g4);}
+.sb-item.active::before{
+  content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;background:var(--g5);border-radius:0 3px 3px 0;
+}
+
+.sb-badge{
+  margin-left:auto;background:var(--g5);color:var(--sp9);
+  font-size:10px;font-weight:800;border-radius:100px;
+  padding:1px 6px;min-width:16px;text-align:center;
+}
+
+.sb-footer{
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:14px;margin-top:10px;
+}
+.sb-user{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:11px;
+  cursor:pointer;transition:background 0.15s;
+}
+.sb-user:hover{background:rgba(255,255,255,0.04);}
+.sb-avatar{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:var(--g5);color:var(--sp9);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;
+}
+.sb-user-name{font-size:12.5px;font-weight:700;color:#fff;line-height:1.2;}
+.sb-user-shop{font-size:10.5px;color:rgba(255,255,255,0.4);margin-top:1px;}
+
+/* Main */
+.main{flex:1;min-width:0;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 32px;
+  position:sticky;top:0;z-index:30;
+  background:#FEF3DC;
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.tb-greeting{}
+.tb-hello{font-size:11px;font-weight:700;color:var(--sp5);text-transform:uppercase;letter-spacing:0.08em;}
+.tb-date{font-size:19px;font-weight:800;color:var(--sp9);letter-spacing:-0.3px;margin-top:2px;}
+
+.tb-actions{display:flex;align-items:center;gap:10px;}
+.tb-icon-btn{
+  width:40px;height:40px;border-radius:11px;
+  background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--txt2);font-size:18px;cursor:pointer;
+  position:relative;transition:border-color 0.15s,color 0.15s;
+}
+.tb-icon-btn:hover{border-color:var(--border-s);color:var(--sp7);}
+.tb-icon-dot{
+  position:absolute;top:8px;right:8px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--g5);border:1.5px solid #fff;
+}
+
+.content{padding:28px 32px 100px;}
+
+/* Prediction Cards */
+.pred-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:20px;
+}
+
+.pred-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px;
+  transition:all 0.2s;
+}
+.pred-card:hover{
+  box-shadow:0 8px 24px rgba(245,166,35,0.1);
+  transform:translateY(-2px);
+}
+
+.pred-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+}
+.pred-icon{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--g0);color:#92600A;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.pred-title{
+  font-size:16px;font-weight:800;color:var(--sp9);
+}
+.pred-subtitle{
+  font-size:12px;color:var(--txt2);margin-top:2px;
+}
+
+.pred-body{
+  margin:16px 0;
+}
+.pred-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid #F4F3EE;
+}
+.pred-item:last-child{border-bottom:none;}
+.pred-name{font-weight:700;color:var(--txt);}
+.pred-qty{font-weight:800;color:var(--sp9);}
+.pred-conf{font-size:11px;color:var(--txt2);}
+
+.pred-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.pred-btn{
+  flex:1;
+  height:42px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.pred-btn.secondary{
+  background:#F4F3EE;
+  color:var(--sp8);
+}
+.pred-btn.primary{
+  background:var(--sp8);
+  color:#fff;
+}
+
+/* Mobile Bottom Nav */
+.bottom-nav{display:none;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .content{padding:20px 16px 90px;}
+  .topbar{padding:16px 18px;}
+  
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:50;
+    background:#EBF6F1;
+    border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    justify-content:space-around;
+    box-shadow:0 -4px 20px rgba(12,51,38,0.06);
+  }
+  .bn-item{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--txt2);font-size:9.5px;font-weight:700;padding:6px 10px;cursor:pointer;
+  }
+  .bn-item i{font-size:21px;}
+  .bn-item.active{color:var(--sp7);}
+  .bn-item.fab{
+    background:var(--sp8);color:#fff;width:50px;height:50px;border-radius:16px;
+    margin-top:-15px;justify-content:center;box-shadow:0 6px 16px rgba(15,61,46,0.35);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-box"><img src="SPlogo.png" alt="StorePilot"></div>
+      <div class="sb-logo-text">
+        <div class="sb-logo-name">Store<span>Pilot</span></div>
+        <div class="sb-logo-sub">Kirana Business OS</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a href="dashboard.html" class="sb-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+      <a href="inventory.html" class="sb-item"><i class="ti ti-package"></i> Inventory</a>
+      <a href="billing.html" class="sb-item"><i class="ti ti-receipt"></i> Billing</a>
+      <a href="customers.html" class="sb-item"><i class="ti ti-users"></i> Customers</a>
+      <a href="suppliers.html" class="sb-item"><i class="ti ti-truck"></i> Suppliers</a>
+      <a href="predictions.html" class="sb-item active"><i class="ti ti-bulb"></i> Predictions</a>
+      <a href="reports.html" class="sb-item"><i class="ti ti-file-analytics"></i> Reports</a>
+      <a href="settings.html" class="sb-item"><i class="ti ti-settings"></i> Settings</a>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">SK</div>
+        <div>
+          <div class="sb-user-name">Sudip Kale</div>
+          <div class="sb-user-shop">Sharma General Store</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-greeting">
+        <div class="tb-hello">AI Predictions</div>
+        <div class="tb-date">Next 7 days forecast</div>
+      </div>
+      <div class="tb-actions">
+        <a href="alerts.html" class="tb-icon-btn"><i class="ti ti-bell" aria-hidden="true"></i></a>
+        <a href="predictions.html" class="tb-icon-btn"><i class="ti ti-bulb" aria-hidden="true"></i></a>
+        <a href="settings.html" class="tb-icon-btn"><i class="ti ti-settings" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Learning Banner — shown when no predictions ready yet -->
+      <div id="learningBanner" style="display:none;background:linear-gradient(135deg,#0F3D2E,#155E45);border-radius:18px;padding:20px 24px;margin-bottom:20px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <i class="ti ti-brain" style="font-size:22px;color:var(--g4);"></i>
+          <div style="font-size:15px;font-weight:800;">AI is still learning your store</div>
+        </div>
+        <div id="learningMsg" style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;"></div>
+      </div>
+
+      <div id="predGrid" class="pred-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--txt2);font-size:14px;font-weight:600;">
+          Loading predictions...
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Mobile Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
+  <a href="inventory.html" class="bn-item"><i class="ti ti-package"></i><span>Stock</span></a>
+  <a href="billing.html" class="bn-item fab"><i class="ti ti-receipt"></i></a>
+  <a href="customers.html" class="bn-item"><i class="ti ti-users"></i><span>Udhar</span></a>
+  <a href="suppliers.html" class="bn-item"><i class="ti ti-truck"></i><span>Suppliers</span></a>
+</nav>
+
+<script>
+const API = "http://127.0.0.1:8000/api/v1";
+const token = () => localStorage.getItem("token");
+const hdrs = () => ({ "Content-Type": "application/json", "Authorization": `Bearer ${token()}` });
+
+const riskColors = { high:"#DC2626", medium:"#D97706", low:"#16A34A" };
+const riskBg    = { high:"#FEF2F2", medium:"#FFFBEB", low:"#ECFDF5" };
+
+function renderCard(p) {
+  const icon = p.festival_boost ? '<i class="ti ti-calendar-event"></i>' : '<i class="ti ti-chart-bar"></i>';
+  const subtitle = p.festival_boost
+    ? p.festival_name + " boost &times;" + p.festival_multiplier
+    : p.method_used + " forecast";
+  const riskStyle = "color:" + riskColors[p.risk_level] + ";background:" + riskBg[p.risk_level] + ";padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;";
+  const reorderRow = p.reorder_qty
+    ? '<div style="font-size:12px;font-weight:700;color:var(--sp7);margin-bottom:14px;">Reorder suggestion: ' + p.reorder_qty + ' units &middot; Current stock: ' + p.current_stock + '</div>'
+    : "";
+  return '<div class="pred-card" id="card-' + p.product_id + '">'
+    + '<div class="pred-header">'
+    +   '<div class="pred-icon" style="background:var(--g0);color:#92600A;">' + icon + '</div>'
+    +   '<div style="flex:1;min-width:0;">'
+    +     '<div class="pred-title">' + p.product_name + '</div>'
+    +     '<div class="pred-subtitle">' + subtitle + '</div>'
+    +   '</div>'
+    +   '<span style="' + riskStyle + '">' + p.risk_level + '</span>'
+    + '</div>'
+    + '<div style="background:#F7F6F3;border-radius:14px;padding:16px;margin:12px 0;">'
+    +   '<div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Forecast next 7 days</div>'
+    +   '<div style="font-size:28px;font-weight:900;color:var(--sp9);">' + p.confidence_low + '&ndash;' + p.confidence_high + ' <span style="font-size:14px;font-weight:600;color:var(--txt2);">units</span></div>'
+    +   '<div style="font-size:12px;color:var(--txt2);margin-top:4px;">Best estimate: <strong>' + p.forecast_qty + ' units</strong></div>'
+    + '</div>'
+    + '<div style="font-size:12.5px;color:var(--txt2);line-height:1.6;margin-bottom:14px;">' + p.reason + '</div>'
+    + reorderRow
+    + '<div class="pred-actions">'
+    +   '<button class="pred-btn secondary" onclick="ignorePrediction(' + p.product_id + ')"><i class="ti ti-x"></i> Ignore</button>'
+    +   '<button class="pred-btn primary" onclick="confirmPrediction(' + p.product_id + ',' + p.forecast_qty + ')"><i class="ti ti-check"></i> Confirm</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderLearningCard(p) {
+  var pct = Math.round((p.learning_days_complete / p.learning_days_total) * 100);
+  return '<div class="pred-card" style="border:2px dashed var(--border);opacity:0.8;">'
+    + '<div class="pred-header">'
+    +   '<div class="pred-icon" style="background:var(--sp0);color:var(--sp7);"><i class="ti ti-brain"></i></div>'
+    +   '<div>'
+    +     '<div class="pred-title">' + p.product_name + '</div>'
+    +     '<div class="pred-subtitle">Learning &middot; ' + p.learning_days_complete + '/' + p.learning_days_total + ' days</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div style="background:#F4F3EE;border-radius:10px;height:8px;margin:12px 0;">'
+    +   '<div style="background:var(--sp7);border-radius:10px;height:8px;width:' + pct + '%;"></div>'
+    + '</div>'
+    + '<div style="font-size:12.5px;color:var(--txt2);line-height:1.6;">' + p.reason + '</div>'
+    + '</div>';
+}
+
+async function loadPredictions() {
+  try {
+    const res = await fetch(API + "/predictions", { headers: hdrs() });
+    if (!res.ok) return;
+    const data = await res.json();
+    const grid = document.getElementById("predGrid");
+    var html = "";
+    data.ready.forEach(function(p) { html += renderCard(p); });
+    data.learning.forEach(function(p) { html += renderLearningCard(p); });
+    if (!html) {
+      html = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--txt2);">'
+           + '<i class="ti ti-package" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.3;"></i>'
+           + 'No products yet. Add products in Inventory to see predictions.</div>';
+    }
+    grid.innerHTML = html;
+    if (data.learning.length > 0 && data.ready.length === 0) {
+      document.getElementById("learningBanner").style.display = "block";
+      document.getElementById("learningMsg").textContent =
+        "StorePilot needs " + data.learning[0].learning_days_total +
+        " days of sales history to generate predictions. Keep billing and check back soon!";
+    }
+  } catch(e) {
+    document.getElementById("predGrid").innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--txt2);">Could not load predictions. Check server.</div>';
+  }
+}
+
+async function confirmPrediction(productId, qty) {
+  try {
+    const res = await fetch(API + "/predictions/" + productId + "/override", {
+      method: "POST", headers: hdrs(),
+      body: JSON.stringify({ adjusted_qty: qty, reason: "Confirmed by owner" }),
+    });
+    if (!res.ok) return;
+    const card = document.getElementById("card-" + productId);
+    if (card) {
+      card.style.opacity = "0.5";
+      card.querySelector(".pred-actions").innerHTML =
+        '<div style="width:100%;text-align:center;font-size:13px;font-weight:700;color:var(--green5);padding:10px;"><i class="ti ti-check-circle"></i> Confirmed!</div>';
+    }
+  } catch(e) {}
+}
+
+function ignorePrediction(productId) {
+  const card = document.getElementById("card-" + productId);
+  if (card) {
+    card.style.transition = "opacity 0.3s";
+    card.style.opacity = "0";
+    setTimeout(function() { card.remove(); }, 300);
+  }
+}
+
+loadPredictions();
+
+(function(){
+  const t = localStorage.getItem("token");
+  if (!t) return;
+  fetch("http://127.0.0.1:8000/api/v1/auth/me", {
+    headers: { "Authorization": "Bearer " + t }
+  }).then(r => r.json()).then(d => {
+    const nameEl = document.querySelector(".sb-user-name");
+    const shopEl = document.querySelector(".sb-user-shop");
+    const avEl   = document.querySelector(".sb-avatar");
+    if (nameEl) nameEl.textContent = d.name;
+    if (shopEl) shopEl.textContent = d.store_name;
+    if (avEl)   avEl.textContent   = d.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+  }).catch(()=>{});
+})();
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a14bdca5ecea7ef5',t:'MTc4Mjk3NjU1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

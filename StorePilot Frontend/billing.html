@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Billing</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+  --red0:#FEF2F2;--red5:#DC2626;
+  --green5:#16A34A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--ivory);
+  background-image:
+    radial-gradient(circle at 95% 0%, rgba(245,166,35,0.04) 0%, transparent 40%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size: auto, 24px 24px;
+  min-height:100vh;
+  color:var(--txt);
+}
+
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;}
+
+/* App Shell */
+.shell{display:flex;min-height:100vh;}
+
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--sp8);
+  display:flex;flex-direction:column;
+  padding:24px 16px;
+  position:sticky;top:0;height:100vh;
+}
+
+.sb-logo{display:flex;align-items:center;gap:12px;padding:8px 10px 28px;}
+.sb-logo-box{width:40px;height:40px;border-radius:11px;background:#1E8A63;display:flex;align-items:center;justify-content:center;}
+.sb-logo-box img{width:32px;height:32px;object-fit:contain;}
+.sb-logo-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:-0.3px;}
+.sb-logo-name span{color:var(--g4);}
+.sb-logo-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+
+.sb-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.sb-item{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;
+  font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.55);cursor:pointer;position:relative;
+  transition:background 0.15s,color 0.15s;
+}
+.sb-item i{font-size:18px;width:18px;text-align:center;}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(245,166,35,0.13);color:#fff;}
+.sb-item.active i{color:var(--g4);}
+.sb-item.active::before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--g5);border-radius:0 3px 3px 0;}
+
+.sb-footer{border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:10px;}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;cursor:pointer;transition:background 0.15s;}
+.sb-user:hover{background:rgba(255,255,255,0.04);}
+.sb-avatar{width:34px;height:34px;border-radius:9px;background:var(--g5);color:var(--sp9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+.sb-user-name{font-size:12.5px;font-weight:700;color:#fff;line-height:1.2;}
+.sb-user-shop{font-size:10.5px;color:rgba(255,255,255,0.4);margin-top:1px;}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;border-bottom:1px solid var(--border);
+  background:#FEF3DC;backdrop-filter:blur(10px);position:sticky;top:0;z-index:20;
+}
+.tb-eyebrow{font-size:11px;font-weight:700;color:var(--sp5);text-transform:uppercase;letter-spacing:0.08em;}
+.tb-title{font-size:20px;font-weight:900;color:var(--sp9);letter-spacing:-0.4px;margin-top:2px;}
+.tb-actions{display:flex;gap:10px;align-items:center;}
+.tb-icon-btn{
+  width:40px;height:40px;border-radius:11px;border:1px solid var(--border);
+  background:#fff;font-size:18px;color:var(--txt2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.tb-icon-btn:hover{border-color:var(--border-s);color:var(--sp7);}
+
+/* POS Layout */
+.pos{display:grid;grid-template-columns:1fr 380px;flex:1;min-height:0;}
+.pos-left{padding:22px 28px 28px;overflow-y:auto;}
+.pos-right{
+  background:#fff;border-left:1px solid var(--border);
+  display:flex;flex-direction:column;position:sticky;top:72px;height:calc(100vh - 72px);
+}
+
+/* Scan Zone */
+.scan-zone{
+  background:linear-gradient(135deg,var(--sp9),var(--sp8));
+  border-radius:22px;padding:20px 22px;margin-bottom:18px;position:relative;overflow:hidden;
+}
+.scan-zone::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(245,166,35,0.04) 18px,rgba(245,166,35,0.04) 19px);
+}
+.scan-inner{position:relative;z-index:1;}
+.scan-label{font-size:11px;font-weight:800;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+.scan-row{display:flex;gap:10px;}
+.scan-input-wrap{flex:1;position:relative;}
+.scan-input-wrap i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--g4);font-size:22px;}
+.scan-input{
+  width:100%;height:56px;border:none;border-radius:16px;padding:0 16px 0 52px;
+  font-size:16px;font-weight:700;background:rgba(255,255,255,0.95);outline:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+}
+.scan-input:focus{box-shadow:0 0 0 4px rgba(245,166,35,0.35),0 8px 24px rgba(0,0,0,0.12);}
+.scan-btn{
+  width:56px;height:56px;border-radius:16px;border:none;background:var(--g5);color:var(--sp9);
+  font-size:22px;cursor:pointer;flex-shrink:0;transition:transform 0.12s;
+}
+.scan-btn:hover{transform:scale(1.05);}
+
+.cat-scroll{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cat-btn{
+  height:36px;padding:0 14px;border-radius:100px;border:1.5px solid var(--border);
+  background:#fff;font-size:12px;font-weight:800;color:var(--txt2);white-space:nowrap;cursor:pointer;
+}
+.cat-btn.active{background:var(--sp8);border-color:var(--sp8);color:#fff;}
+
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:16px;
+}
+.prod-tile{
+  background:#fff;border:2px solid var(--border);border-radius:18px;padding:14px;
+  cursor:pointer;transition:transform 0.12s,border-color 0.15s,box-shadow 0.15s;
+  position:relative;overflow:hidden;
+}
+.prod-tile:hover{transform:translateY(-3px) scale(1.02);border-color:var(--g5);box-shadow:0 12px 28px rgba(245,166,35,0.15);}
+.prod-tile:active{transform:scale(0.97);}
+.pt-emoji{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px;}
+.pt-name{font-size:13px;font-weight:800;color:var(--txt);line-height:1.2;}
+.pt-price{font-size:15px;font-weight:900;color:var(--sp7);margin-top:6px;}
+.pt-stock{font-size:10px;color:var(--txt2);margin-top:3px;font-weight:600;}
+
+/* Bill Panel */
+.bill-head{padding:20px 20px 14px;border-bottom:1px solid #F3F4F6;}
+.bill-head-row{display:flex;align-items:center;justify-content:space-between;}
+.bill-label{font-size:12px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:0.06em;}
+.bill-no{font-size:12px;font-weight:800;color:var(--sp5);}
+.bill-total-wrap{
+  margin-top:14px;padding:18px;border-radius:18px;
+  background:linear-gradient(135deg,var(--g0) 0%,#fff 100%);
+  border:2px solid rgba(245,166,35,0.35);text-align:center;
+}
+.bill-total-label{font-size:11px;font-weight:800;color:#92600A;text-transform:uppercase;letter-spacing:0.08em;}
+.bill-total{font-size:42px;font-weight:900;color:var(--sp9);letter-spacing:-2px;line-height:1.1;margin-top:4px;}
+.bill-items{flex:1;overflow-y:auto;padding:12px 16px;min-height:120px;}
+.bill-empty{text-align:center;padding:40px 16px;color:var(--txt2);}
+.bill-empty i{font-size:36px;color:#D1D5DB;margin-bottom:10px;display:block;}
+.bill-empty p{font-size:13px;font-weight:600;}
+.bill-line{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6;}
+.bill-line:last-child{border-bottom:none;}
+.bl-info{flex:1;min-width:0;}
+.bl-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bl-rate{font-size:11px;color:var(--txt2);margin-top:2px;}
+.qty-ctrl{display:flex;align-items:center;gap:6px;}
+.qty-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:16px;font-weight:800;cursor:pointer;color:var(--sp7);display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{background:var(--sp0);}
+.qty-val{font-size:13px;font-weight:800;min-width:18px;text-align:center;}
+.bl-amt{font-size:14px;font-weight:900;color:var(--sp9);min-width:52px;text-align:right;}
+.bl-del{width:28px;height:28px;border:none;background:var(--red0);color:var(--red5);border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+
+.bill-foot{padding:16px 20px 20px;border-top:1px solid #F3F4F6;background:#FAFAF8;}
+.bill-summary{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--txt2);margin-bottom:6px;}
+.bill-summary strong{color:var(--txt);font-weight:800;}
+.pay-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+.pay-btn{
+  height:48px;border-radius:14px;border:2px solid var(--border);background:#fff;
+  font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;transition:all 0.15s;
+}
+.pay-btn i{font-size:18px;}
+.pay-btn:hover{border-color:var(--sp5);background:var(--sp0);}
+.pay-btn.selected{border-color:var(--sp8);background:var(--sp8);color:#fff;}
+.charge-btn{
+  width:100%;height:54px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,var(--sp8),var(--sp7));color:#fff;
+  font-size:15px;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 8px 24px rgba(15,61,46,0.3);transition:transform 0.12s;
+}
+.charge-btn:hover:not(:disabled){transform:translateY(-1px);}
+.charge-btn:disabled{opacity:0.45;cursor:not-allowed;}
+.clear-link{display:block;text-align:center;margin-top:10px;font-size:12px;font-weight:700;color:var(--red5);cursor:pointer;background:none;border:none;width:100%;}
+
+.bottom-nav{display:none;}
+.view-bill-btn{display:none;}
+
+/* Mobile Responsive */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .pos{grid-template-columns:1fr;}
+  
+  .pos-right.show{
+    display:flex;
+  }
+  
+  .pos-right{
+    display:none;
+    position:fixed;
+    bottom:70px;
+    left:0;
+    right:0;
+    height:auto;
+    max-height:55vh;
+    border-left:none;
+    border-top:1px solid var(--border);
+    border-radius:22px 22px 0 0;
+    box-shadow:0 -8px 32px rgba(12,51,38,0.12);
+    z-index:40;
+    flex-direction:column;
+  }
+  
+  .pos-left{padding:16px 16px 90px;}
+  .topbar{padding:14px 16px;}
+  
+  .view-bill-btn{
+    position:fixed;
+    bottom:80px;
+    right:20px;
+    background:var(--g5);
+    color:#fff;
+    border:none;
+    border-radius:50px;
+    padding:12px 20px;
+    font-size:14px;
+    font-weight:800;
+    box-shadow:0 6px 20px rgba(245,166,35,0.4);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    z-index:45;
+    cursor:pointer;
+  }
+  
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:#EBF6F1;border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    justify-content:space-around;align-items:center;
+    box-shadow:0 -4px 20px rgba(12,51,38,0.06);
+  }
+  .bn-item{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--txt2);font-size:9.5px;font-weight:700;padding:6px 10px;cursor:pointer;
+  }
+  .bn-item i{font-size:21px;}
+  .bn-item.active{color:rgba(15,61,46,0.35);}
+  .bn-item.fab{
+    background:var(--sp8);color:#fff;
+    width:50px;height:50px;border-radius:16px;
+    margin-top:-28px;justify-content:center;
+    box-shadow:0 6px 16px rgba(15,61,46,0.35);
+  }
+  .bn-item.fab span{display:none;}
+}
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-box"><img src="SPlogo.png" alt="StorePilot"></div>
+      <div>
+        <div class="sb-logo-name">Store<span>Pilot</span></div>
+        <div class="sb-logo-sub">Kirana Business OS</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a href="dashboard.html" class="sb-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+      <a href="inventory.html" class="sb-item"><i class="ti ti-package"></i> Inventory</a>
+      <a href="billing.html" class="sb-item active"><i class="ti ti-receipt"></i> Billing</a>
+      <a href="customers.html" class="sb-item"><i class="ti ti-users"></i> Customers</a>
+      <a href="suppliers.html" class="sb-item"><i class="ti ti-truck"></i> Suppliers</a>
+      <a href="predictions.html" class="sb-item"><i class="ti ti-bulb"></i> Predictions</a>
+      <a href="reports.html" class="sb-item"><i class="ti ti-file-analytics"></i> Reports</a>
+      <a href="settings.html" class="sb-item"><i class="ti ti-settings"></i> Settings</a>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">SK</div>
+        <div>
+          <div class="sb-user-name">Sudip Kale</div>
+          <div class="sb-user-shop">Sharma General Store</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-eyebrow"><span class="tb-icon-dot" style="position:static;display:inline-block;margin-right:6px;"></span> Live counter</div>
+        <div class="tb-title">Quick Billing</div>
+      </div>
+      <div class="tb-actions">
+        <div class="tb-icon-btn"><i class="ti ti-bell" aria-hidden="true"></i><div class="tb-icon-dot"></div></div>
+        <a href="predictions.html" class="tb-icon-btn"><i class="ti ti-bulb" aria-hidden="true"></i></a>
+        <a href="settings.html" class="tb-icon-btn"><i class="ti ti-settings" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="pos">
+      <!-- Left: Products -->
+      <div class="pos-left">
+        <!-- Scan Zone -->
+        <div class="scan-zone">
+          <div class="scan-inner">
+            <div class="scan-label">Scan or search — bill in seconds</div>
+            <div class="scan-row">
+              <div class="scan-input-wrap">
+                <i class="ti ti-barcode"></i>
+                <input class="scan-input" id="scanInput" placeholder="Type product name or scan barcode..." autofocus>
+              </div>
+              <button class="scan-btn" id="scanBtn"><i class="ti ti-plus"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="cat-scroll" id="catScroll">
+          <button class="cat-btn active" data-cat="all">🔥 All</button>
+          <button class="cat-btn" data-cat="dairy">🥛 Dairy</button>
+          <button class="cat-btn" data-cat="snack">🍪 Snacks</button>
+          <button class="cat-btn" data-cat="grocery">🌾 Grocery</button>
+          <button class="cat-btn" data-cat="personal">🧴 Personal</button>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid" id="productGrid"></div>
+      </div>
+
+      <!-- Right: Bill Panel -->
+      <div class="pos-right" id="billPanel">
+        <div class="bill-head">
+          <div class="bill-head-row">
+            <div class="bill-label">Current bill</div>
+            <div class="bill-no" id="billNo">#B-064</div>
+          </div>
+          <div class="bill-total-wrap">
+            <div class="bill-total-label">Total amount</div>
+            <div class="bill-total" id="billTotal">₹0</div>
+          </div>
+        </div>
+
+        <div class="bill-items" id="billItems">
+          <div class="bill-empty" id="billEmpty">
+            <i class="ti ti-shopping-cart"></i>
+            <p>Tap products to start billing</p>
+          </div>
+        </div>
+
+        <div class="bill-foot">
+          <div class="bill-summary"><span>Items</span><strong id="itemCount">0</strong></div>
+          <div class="bill-summary"><span>Subtotal</span><strong id="subtotal">₹0</strong></div>
+          
+          <div class="pay-row">
+            <button class="pay-btn cash selected" data-pay="cash"><i class="ti ti-cash"></i>Cash</button>
+            <button class="pay-btn upi" data-pay="upi"><i class="ti ti-qrcode"></i>UPI</button>
+            <button class="pay-btn udhar" data-pay="udhar"><i class="ti ti-notebook"></i>Udhar</button>
+          </div>
+
+          <!-- Udhar customer lookup — shown only when Udhar is selected -->
+          <div id="udharBox" style="display:none;margin-bottom:12px;background:var(--sp0);border:1.5px solid var(--sp5);border-radius:14px;padding:14px;">
+            <div style="font-size:11px;font-weight:800;color:var(--sp7);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;">Customer for Udhar</div>
+            <input id="udharSearch" type="tel" placeholder="Enter phone number to search..." style="width:100%;height:42px;border:1.5px solid #E5E7EB;border-radius:10px;padding:0 12px;font-family:inherit;font-size:13px;font-weight:500;outline:none;margin-bottom:8px;">
+            <div id="udharResult"></div>
+          </div>
+
+          <button class="charge-btn" id="chargeBtn" disabled>
+            <i class="ti ti-receipt-2"></i> Charge &amp; print bill
+          </button>
+          <button class="clear-link" id="clearBtn">Clear bill</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Floating Button -->
+    <button class="view-bill-btn" id="viewBillBtn">
+      <i class="ti ti-receipt"></i> View Bill
+    </button>
+  </main>
+</div>
+
+<!-- Mobile Bottom Nav (same as customers.html) -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
+  <a href="inventory.html" class="bn-item"><i class="ti ti-package"></i><span>Stock</span></a>
+  <a href="billing.html" class="bn-item fab active"><i class="ti ti-receipt"></i></a>
+  <a href="customers.html" class="bn-item"><i class="ti ti-users"></i><span>Udhar</span></a>
+  <a href="suppliers.html" class="bn-item"><i class="ti ti-truck"></i><span>Suppliers</span></a>
+</nav>
+
+<script>
+(() => {
+  // ── CONFIG ────────────────────────────────────────────────────────────────
+  const API = "http://127.0.0.1:8000/api/v1";
+  const token = () => localStorage.getItem("token");
+  const headers = () => ({
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token()}`,
+  });
+
+
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  let catalog = [];        // loaded from API
+  let cart = [];
+  let activeCat = "all";
+  let payMode = "cash";
+  let selectedCustomerId = null;
+
+  // ── DOM REFS ──────────────────────────────────────────────────────────────
+  const productGrid  = document.getElementById("productGrid");
+  const billItems    = document.getElementById("billItems");
+  const billEmpty    = document.getElementById("billEmpty");
+  const billTotal    = document.getElementById("billTotal");
+  const subtotalEl   = document.getElementById("subtotal");
+  const itemCount    = document.getElementById("itemCount");
+  const chargeBtn    = document.getElementById("chargeBtn");
+  const scanInput    = document.getElementById("scanInput");
+  const billPanel    = document.getElementById("billPanel");
+  const viewBillBtn  = document.getElementById("viewBillBtn");
+  const billNo       = document.getElementById("billNo");
+
+  // ── HELPERS ───────────────────────────────────────────────────────────────
+  const showToast = (msg, error = false) => {
+    const toast = document.createElement("div");
+    toast.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:${error ? "#DC2626" : "#0F3D2E"};color:#fff;padding:12px 24px;
+      border-radius:12px;font-size:13px;font-weight:700;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:200;text-align:center;max-width:320px;`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
+  };
+
+  const formatRs = (n) => "₹" + Number(n).toLocaleString("en-IN");
+  const getTotal = () => cart.reduce((s, i) => s + i.selling_price * i.qty, 0);
+
+  const categoryEmoji = {
+    dairy: "🥛", snacks: "🍪", grocery: "🌾",
+    personal: "🧴", beverages: "🥤",
+  };
+
+  // ── LOAD PRODUCTS FROM API ────────────────────────────────────────────────
+  async function loadProducts() {
+    try {
+      productGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--txt2);font-size:13px;font-weight:600;">Loading products...</div>`;
+      const res = await fetch(`${API}/products`, { headers: headers() });
+      if (!res.ok) {
+        productGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--txt2);font-size:13px;font-weight:600;">No products yet. Add some from Inventory.</div>`;
+        return;
+      }
+      catalog = await res.json();
+      renderProducts();
+    } catch (e) {
+      productGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--txt2);font-size:13px;font-weight:600;">No products yet. Add some from Inventory.</div>`;
+    }
+  }
+
+  // ── RENDER PRODUCTS ───────────────────────────────────────────────────────
+  const renderProducts = () => {
+    const q = scanInput.value.trim().toLowerCase();
+    const list = catalog.filter((p) => {
+      const catOk = activeCat === "all" || p.category === activeCat;
+      const searchOk = !q || p.name.toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q);
+      return catOk && searchOk && p.is_active;
+    });
+
+    productGrid.innerHTML = list.map((p) => `
+      <div class="prod-tile" data-id="${p.product_id}">
+        <div class="pt-emoji" style="background:var(--sp0);">${categoryEmoji[p.category] || "📦"}</div>
+        <div class="pt-name">${p.name}</div>
+        <div class="pt-price">${formatRs(p.selling_price)}</div>
+        <div class="pt-stock">${p.current_stock > 0 ? `${p.current_stock} in stock` : "Out of stock"}</div>
+      </div>
+    `).join("") || `<div class="bill-empty" style="grid-column:1/-1"><p>No products found</p></div>`;
+  };
+
+  // ── CART ──────────────────────────────────────────────────────────────────
+  const addToCart = (product) => {
+    if (product.current_stock <= 0) { showToast(`${product.name} is out of stock`, true); return; }
+    const existing = cart.find((c) => c.product_id === product.product_id);
+    if (existing) {
+      if (existing.qty >= product.current_stock) { showToast("Not enough stock", true); return; }
+      existing.qty += 1;
+    } else {
+      cart.push({ ...product, qty: 1 });
+    }
+    renderBill();
+    showToast(`${product.name} added`);
+  };
+
+  const renderBill = () => {
+    const total = getTotal();
+    const items = cart.reduce((s, i) => s + i.qty, 0);
+    billTotal.textContent = formatRs(total);
+    subtotalEl.textContent = formatRs(total);
+    itemCount.textContent = items;
+    chargeBtn.disabled = cart.length === 0;
+    billEmpty.style.display = cart.length ? "none" : "block";
+
+    const lines = cart.map((item) => `
+      <div class="bill-line" data-id="${item.product_id}">
+        <div class="bl-info">
+          <div class="bl-name">${categoryEmoji[item.category] || "📦"} ${item.name}</div>
+          <div class="bl-rate">${formatRs(item.selling_price)} each</div>
+        </div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" data-action="minus" data-id="${item.product_id}">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" data-action="plus" data-id="${item.product_id}">+</button>
+        </div>
+        <div class="bl-amt">${formatRs(item.selling_price * item.qty)}</div>
+        <button class="bl-del" data-action="remove" data-id="${item.product_id}"><i class="ti ti-x"></i></button>
+      </div>
+    `).join("");
+
+    billItems.innerHTML = (cart.length ? lines : "") + billEmpty.outerHTML;
+    if (cart.length) billItems.querySelector(".bill-empty")?.remove();
+  };
+
+  // ── PRODUCT CLICK ─────────────────────────────────────────────────────────
+  productGrid.addEventListener("click", (e) => {
+    const tile = e.target.closest(".prod-tile");
+    if (!tile) return;
+    const product = catalog.find((p) => p.product_id === Number(tile.dataset.id));
+    if (product) addToCart(product);
+  });
+
+  // ── BILL ITEM CONTROLS ────────────────────────────────────────────────────
+  billItems.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    const item = cart.find((c) => c.product_id === id);
+    if (!item) return;
+    const action = btn.dataset.action;
+    if (action === "plus") item.qty += 1;
+    if (action === "minus") item.qty -= 1;
+    if (action === "remove" || item.qty <= 0) cart = cart.filter((c) => c.product_id !== id);
+    renderBill();
+  });
+
+  // ── CATEGORY FILTER ───────────────────────────────────────────────────────
+  document.getElementById("catScroll").addEventListener("click", (e) => {
+    const btn = e.target.closest(".cat-btn");
+    if (!btn) return;
+    document.querySelectorAll(".cat-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCat = btn.dataset.cat;
+    renderProducts();
+  });
+
+  // ── SEARCH / SCAN ─────────────────────────────────────────────────────────
+  scanInput.addEventListener("input", renderProducts);
+  scanInput.addEventListener("keydown", async (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = scanInput.value.trim();
+    if (!q) return;
+
+    // Try barcode lookup first (exact match via API)
+    try {
+      const res = await fetch(`${API}/products/barcode/${encodeURIComponent(q)}`, { headers: headers() });
+      if (res.ok) {
+        const product = await res.json();
+        // Update local catalog with fresh stock info
+        const idx = catalog.findIndex(p => p.product_id === product.product_id);
+        if (idx >= 0) catalog[idx] = product; else catalog.push(product);
+        addToCart(product);
+        scanInput.value = "";
+        renderProducts();
+        return;
+      }
+    } catch (_) {}
+
+    // Fallback: search local catalog by name
+    const match = catalog.find((p) => p.name.toLowerCase().includes(q.toLowerCase()));
+    if (match) {
+      addToCart(match);
+      scanInput.value = "";
+      renderProducts();
+    }
+  });
+
+  document.getElementById("scanBtn").addEventListener("click", () => {
+    scanInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+  });
+
+  // ── PAYMENT MODE ──────────────────────────────────────────────────────────
+  const udharBox = document.getElementById("udharBox");
+  const udharSearch = document.getElementById("udharSearch");
+  const udharResult = document.getElementById("udharResult");
+
+  document.querySelectorAll(".pay-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".pay-btn").forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      payMode = btn.dataset.pay;
+
+      // Show/hide Udhar customer box
+      if (payMode === "udhar") {
+        udharBox.style.display = "block";
+        selectedCustomerId = null;
+        udharSearch.value = "";
+        udharResult.innerHTML = "";
+      } else {
+        udharBox.style.display = "none";
+        selectedCustomerId = null;
+      }
+
+      // QR code for UPI
+      let qrContainer = document.getElementById("dynamicQrContainer");
+      if (payMode === "upi") {
+        if (!qrContainer) {
+          qrContainer = document.createElement("div");
+          qrContainer.id = "dynamicQrContainer";
+          qrContainer.style.cssText = "margin:16px 0;padding:16px;background:var(--sp0);border:2px dashed var(--sp5);border-radius:14px;text-align:center;";
+          const currentTotal = billTotal.textContent || "₹0";
+          qrContainer.innerHTML = `
+            <div style="font-size:12px;font-weight:800;color:var(--sp9);margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
+              <i class="ti ti-qrcode" style="font-size:18px;color:var(--sp5);"></i> STOREPILOT UPI INSTANT QR
+            </div>
+            <div style="width:110px;height:110px;background:#fff;margin:0 auto 10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;border-radius:10px;">
+              <i class="ti ti-scan" style="font-size:48px;color:var(--sp5);opacity:0.85;"></i>
+            </div>
+            <div style="font-size:12px;color:var(--txt);font-weight:700;margin-bottom:2px;">
+              Payable Total: <span style="color:var(--sp7);font-weight:800;">${currentTotal}</span>
+            </div>
+            <div style="font-size:11px;color:var(--txt2);font-weight:500;">Ask client to pay via PhonePe, GPay, or Paytm</div>`;
+          chargeBtn.parentNode.insertBefore(qrContainer, chargeBtn);
+        }
+      } else {
+        if (qrContainer) qrContainer.remove();
+      }
+    });
+  });
+
+  // ── UDHAR CUSTOMER LOOKUP ─────────────────────────────────────────────────
+  let udharTimer;
+  udharSearch.addEventListener("input", () => {
+    clearTimeout(udharTimer);
+    selectedCustomerId = null;
+    const q = udharSearch.value.trim();
+    if (!q) { udharResult.innerHTML = ""; return; }
+    udharTimer = setTimeout(() => searchCustomer(q), 400);
+  });
+
+  async function searchCustomer(q) {
+    udharResult.innerHTML = `<div style="font-size:12px;color:var(--txt2);font-weight:600;">Searching...</div>`;
+    try {
+      const res = await fetch(`${API}/customers?search=${encodeURIComponent(q)}`, { headers: headers() });
+      if (!res.ok) throw new Error();
+      const customers = await res.json();
+
+      if (customers.length > 0) {
+        // Show matched customers
+        udharResult.innerHTML = customers.slice(0, 3).map(c => `
+          <div onclick="selectCustomer(${c.customer_id}, '${c.name}', ${c.credit_balance})"
+               style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;border-radius:10px;cursor:pointer;margin-bottom:6px;border:1.5px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--sp9);">${c.name}</div>
+              <div style="font-size:11px;color:var(--txt2);">${c.phone} &middot; Outstanding: ₹${Number(c.credit_balance).toLocaleString("en-IN")}</div>
+            </div>
+            <i class="ti ti-chevron-right" style="color:var(--sp5);"></i>
+          </div>`).join("") +
+          `<div onclick="showNewCustomerForm('${q}')" style="padding:8px 12px;font-size:12px;font-weight:700;color:var(--sp7);cursor:pointer;text-align:center;">+ Create new customer instead</div>`;
+      } else {
+        // No match — offer to create
+        showNewCustomerForm(q);
+      }
+    } catch(e) {
+      udharResult.innerHTML = `<div style="font-size:12px;color:var(--txt2);">Could not search. Check server.</div>`;
+    }
+  }
+
+  window.selectCustomer = function(id, name, balance) {
+    selectedCustomerId = id;
+    udharResult.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:2px solid var(--sp7);">
+        <i class="ti ti-check-circle" style="font-size:20px;color:var(--sp7);flex-shrink:0;"></i>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--sp9);">${name}</div>
+          <div style="font-size:11px;color:var(--txt2);">Current outstanding: ₹${Number(balance).toLocaleString("en-IN")}</div>
+        </div>
+        <button onclick="clearCustomer()" style="margin-left:auto;background:none;border:none;color:var(--txt2);cursor:pointer;font-size:16px;"><i class="ti ti-x"></i></button>
+      </div>`;
+  }
+
+  window.clearCustomer = function() {
+    selectedCustomerId = null;
+    udharSearch.value = "";
+    udharResult.innerHTML = "";
+  }
+
+  window.showNewCustomerForm = function(prefill) {
+    selectedCustomerId = null;
+    const isPhone = /^\d{10}$/.test(prefill);
+    udharResult.innerHTML = `
+      <div style="background:#fff;border-radius:10px;padding:12px;border:1.5px solid var(--border);">
+        <div style="font-size:12px;font-weight:800;color:var(--sp9);margin-bottom:10px;">New customer</div>
+        <input id="newCustName" placeholder="Full name" style="width:100%;height:38px;border:1.5px solid #E5E7EB;border-radius:9px;padding:0 10px;font-family:inherit;font-size:13px;margin-bottom:6px;outline:none;">
+        <input id="newCustPhone" placeholder="Phone number" value="${isPhone ? prefill : ""}" style="width:100%;height:38px;border:1.5px solid #E5E7EB;border-radius:9px;padding:0 10px;font-family:inherit;font-size:13px;margin-bottom:8px;outline:none;">
+        <button onclick="createAndSelectCustomer()" style="width:100%;height:36px;border-radius:9px;background:var(--sp8);color:#fff;border:none;font-size:12.5px;font-weight:800;cursor:pointer;">Create &amp; Select</button>
+      </div>`;
+    if (!isPhone) document.getElementById("newCustName").value = prefill;
+  }
+
+  window.createAndSelectCustomer = async function() {
+    const name = document.getElementById("newCustName").value.trim();
+    const phone = document.getElementById("newCustPhone").value.trim();
+    if (!name || !phone) { showToast("Please enter name and phone"); return; }
+    try {
+      const res = await fetch(`${API}/customers`, {
+        method: "POST", headers: headers(),
+        body: JSON.stringify({ name, phone, initial_credit: 0 }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        // If duplicate phone, search and select existing
+        if (res.status === 409) {
+          const search = await fetch(`${API}/customers?search=${encodeURIComponent(phone)}`, { headers: headers() });
+          const existing = await search.json();
+          if (existing.length > 0) { selectCustomer(existing[0].customer_id, existing[0].name, existing[0].credit_balance); return; }
+        }
+        showToast(data.detail || "Could not create customer"); return;
+      }
+      selectCustomer(data.customer_id, data.name, data.credit_balance);
+      showToast(`${name} added as new customer`);
+    } catch(e) { showToast("Server error"); }
+  }
+
+  // ── COMPLETE BILL → POST /api/v1/sales ───────────────────────────────────
+  async function completeBill() {
+    if (!cart.length) return;
+
+    // Validate customer selected for Udhar
+    if (payMode === "udhar" && !selectedCustomerId) {
+      showToast("Please select or create a customer for Udhar", true);
+      udharSearch.focus();
+      return;
+    }
+
+    const originalHTML = chargeBtn.innerHTML;
+    chargeBtn.disabled = true;
+    chargeBtn.innerHTML = `<i class="ti ti-loader" style="animation:spin 1s linear infinite;margin-right:6px;"></i> Processing...`;
+
+    try {
+      const payload = {
+        items: cart.map((item) => ({
+          product_id: item.product_id,
+          quantity: item.qty,
+        })),
+        payment_type: payMode === "ledger" ? "udhar" : payMode,
+        discount_amount: 0,
+        customer_id: payMode === "udhar" ? selectedCustomerId : null,
+      };
+
+      const res = await fetch(`${API}/sales`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show the exact backend error (e.g. insufficient stock)
+        throw new Error(data.detail || "Sale failed");
+      }
+
+      // Success — update UI
+      billNo.textContent = data.invoice_number;
+      showToast(`✓ ${data.message}`);
+
+      // Refresh stock numbers in local catalog
+      for (const soldItem of data.items) {
+        const p = catalog.find(c => c.product_id === soldItem.product_id);
+        if (p) p.current_stock -= soldItem.quantity;
+      }
+
+      cart = [];
+      renderBill();
+      renderProducts();
+      selectedCustomerId = null;
+      udharBox.style.display = "none";
+      udharSearch.value = "";
+      udharResult.innerHTML = "";
+      document.querySelectorAll(".pay-btn").forEach(b => b.classList.remove("selected"));
+      document.querySelector(".pay-btn.cash").classList.add("selected");
+      payMode = "cash";
+
+      const qrContainer = document.getElementById("dynamicQrContainer");
+      if (qrContainer) qrContainer.remove();
+
+      if (window.innerWidth < 900) billPanel.classList.remove("show");
+
+    } catch (err) {
+      showToast(err.message || "Something went wrong", true);
+    } finally {
+      chargeBtn.disabled = cart.length === 0;
+      chargeBtn.innerHTML = originalHTML;
+    }
+  }
+
+  chargeBtn.addEventListener("click", completeBill);
+
+  // ── CLEAR BILL ────────────────────────────────────────────────────────────
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    if (!cart.length) return;
+    cart = [];
+    renderBill();
+    showToast("Bill cleared.");
+  });
+  
+  // ── MOBILE BILL PANEL ─────────────────────────────────────────────────────
+  if (window.innerWidth < 900) {
+    viewBillBtn.style.display = "flex";
+    viewBillBtn.addEventListener("click", () => {
+      billPanel.classList.toggle("show");
+      if (billPanel.classList.contains("show") && !billPanel.querySelector(".close-btn")) {
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "close-btn";
+        closeBtn.innerHTML = '<i class="ti ti-x"></i>';
+        closeBtn.style.cssText = "position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:10px;border:none;background:#F4F3EE;display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:18px;cursor:pointer;";
+        billPanel.appendChild(closeBtn);
+        closeBtn.onclick = () => { billPanel.classList.remove("show"); closeBtn.remove(); };
+      }
+    });
+    document.addEventListener("click", (e) => {
+      if (!billPanel.contains(e.target) && !viewBillBtn.contains(e.target)) {
+        billPanel.classList.remove("show");
+        const existingClose = billPanel.querySelector(".close-btn");
+        if (existingClose) existingClose.remove();
+      }
+    });
+  }
+
+  // ── BOOT ──────────────────────────────────────────────────────────────────
+  loadProducts();
+  renderBill();
+})();
+
+(function(){
+  const t = localStorage.getItem("token");
+  if (!t) return;
+  fetch("http://127.0.0.1:8000/api/v1/auth/me", {
+    headers: { "Authorization": "Bearer " + t }
+  }).then(r => r.json()).then(d => {
+    const nameEl = document.querySelector(".sb-user-name");
+    const shopEl = document.querySelector(".sb-user-shop");
+    const avEl   = document.querySelector(".sb-avatar");
+    if (nameEl) nameEl.textContent = d.name;
+    if (shopEl) shopEl.textContent = d.store_name;
+    if (avEl)   avEl.textContent   = d.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+  }).catch(()=>{});
+})();
+
+</script>
+</body>
+</html>

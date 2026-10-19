@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Suppliers</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);
+  --red0:#FEF2F2;--red5:#DC2626;
+  --green5:#16A34A;
+  --amber0:#FFFBEB;--amber5:#D97706;
+  --blue0:#E6F1FB;--blue5:#185FA5;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--ivory);
+  background-image:
+    radial-gradient(circle at 92% 8%, rgba(245,166,35,0.06) 0%, transparent 35%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size:auto, 22px 22px;
+  min-height:100vh;color:var(--txt);
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+
+.shell{display:flex;min-height:100vh}
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--sp8);
+  display:flex;flex-direction:column;padding:24px 16px;
+  position:sticky;top:0;height:100vh;
+}
+.sb-logo{display:flex;align-items:center;gap:12px;padding:8px 10px 28px;cursor:pointer}
+.sb-logo-box{width:40px;height:40px;border-radius:11px;background:#1E8A63;display:flex;align-items:center;justify-content:center}
+.sb-logo-box img{width:32px;height:32px;object-fit:contain}
+.sb-logo-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:-0.3px}
+.sb-logo-name span{color:var(--g4)}
+.sb-logo-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase}
+.sb-nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.sb-item{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;
+  font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.55);cursor:pointer;position:relative;
+  transition:background 0.15s,color 0.15s;
+}
+.sb-item i{font-size:18px;width:18px;text-align:center}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.85)}
+.sb-item.active{background:rgba(245,166,35,0.13);color:#fff}
+.sb-item.active i{color:var(--g4)}
+.sb-item.active::before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--g5);border-radius:0 3px 3px 0;}
+.sb-badge{margin-left:auto;background:var(--g5);color:var(--sp9);font-size:10px;font-weight:800;border-radius:100px;padding:1px 6px}
+.sb-footer{border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:10px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;cursor:pointer}
+.sb-user:hover{background:rgba(255,255,255,0.04)}
+.sb-avatar{width:34px;height:34px;border-radius:9px;background:var(--g5);color:var(--sp9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.sb-user-name{font-size:12.5px;font-weight:700;color:#fff}
+.sb-user-shop{font-size:10.5px;color:rgba(255,255,255,0.4);margin-top:1px}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 32px;border-bottom:1px solid var(--border);
+  background:#FEF3DC;backdrop-filter:blur(10px);position:sticky;top:0;z-index:30;
+}
+.tb-eyebrow{font-size:11px;font-weight:700;color:var(--sp5);text-transform:uppercase;letter-spacing:0.08em}
+.tb-title{font-size:20px;font-weight:900;color:var(--sp9);letter-spacing:-0.4px;margin-top:2px}
+.tb-actions{display:flex;align-items:center;gap:10px;}
+.tb-icon-btn{
+  width:40px;height:40px;border-radius:11px;background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:18px;cursor:pointer;
+  position:relative;transition:border-color 0.15s,color 0.15s;
+}
+.tb-icon-btn:hover{border-color:var(--border-s);color:var(--sp7);}
+.tb-icon-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--g5);border:1.5px solid #fff;}
+
+.content{padding:28px 28px 100px;}
+
+/* Stats */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{
+  background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.stat-icon.green{background:var(--sp0);color:var(--sp5);}
+.stat-icon.amber{background:var(--amber0);color:var(--amber5);}
+.stat-icon.red{background:var(--red0);color:var(--red5);}
+.stat-icon.gold{background:var(--g0);color:#92600A;}
+.stat-val{font-size:24px;font-weight:900;color:var(--sp9);letter-spacing:-0.6px;}
+.stat-label{font-size:12px;color:var(--txt2);margin-top:2px;font-weight:600;}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:260px;}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--txt2);font-size:18px;}
+.search-input{
+  width:100%;height:48px;border:1.5px solid var(--border);border-radius:14px;
+  padding:0 18px 0 50px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;
+  background:#fff;outline:none;transition:border-color 0.15s;
+}
+.search-input:focus{border-color:var(--sp5);box-shadow:0 0 0 4px rgba(30,138,99,0.08);}
+.btn-add{
+  height:48px;padding:0 22px;border-radius:14px;border:none;
+  background:var(--g5);color:#fff;font-size:14px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:8px;box-shadow:0 6px 16px rgba(245,166,35,0.3);
+  transition:background 0.15s;
+}
+.btn-add:hover{background:#E89C1F;}
+
+/* Supplier Grid */
+.supplier-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:16px;
+}
+
+.sup-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  transition:all 0.2s;
+  cursor:pointer;
+}
+.sup-card:hover{
+  border-color:var(--g5);
+  box-shadow:0 8px 24px rgba(245,166,35,0.1);
+  transform:translateY(-2px);
+}
+
+.sup-header{display:flex;align-items:center;gap:14px;}
+.sup-avatar{
+  width:52px;height:52px;border-radius:14px;background:var(--sp0);color:var(--sp7);
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;
+}
+.sup-info{flex:1;min-width:0;}
+.sup-name{font-size:16px;font-weight:800;color:var(--txt);}
+.sup-phone{font-size:13px;color:var(--txt2);margin-top:2px;}
+
+.sup-meta{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid #F4F3EE;
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+}
+.sup-meta div{font-weight:600;color:var(--txt2);}
+
+.sup-actions{
+  display:flex;
+  gap:8px;
+  margin-top:16px;
+}
+.action-btn{
+  flex:1;
+  height:40px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#fff;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  transition:all 0.15s;
+}
+.action-btn:hover{border-color:var(--sp5);background:var(--sp0);color:var(--sp7);}
+.action-btn.primary{background:var(--sp8);color:#fff;border-color:var(--sp8);}
+.action-btn.primary:hover{background:var(--sp7);}
+
+/* Status pills — used on PO list rows and the pending chips below */
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+  padding:5px 10px;border-radius:8px;white-space:nowrap;
+}
+.status-badge.sent{background:var(--amber0);color:var(--amber5);}
+.status-badge.partial{background:var(--blue0);color:var(--blue5);}
+.status-badge.received{background:#ECFDF3;color:var(--green5);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* Pending purchase order chips inside a supplier card */
+.po-pending{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.po-pending-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#FAFAF7;
+}
+.po-pending-left{min-width:0;}
+.po-pending-id{font-size:12px;font-weight:800;color:var(--txt);}
+.po-pending-meta{font-size:10.5px;color:var(--txt2);margin-top:2px;}
+.po-pending-recv{
+  height:32px;padding:0 12px;border-radius:9px;border:none;background:var(--sp8);color:#fff;
+  font-size:11.5px;font-weight:800;cursor:pointer;flex-shrink:0;transition:background 0.15s;
+}
+.po-pending-recv:hover{background:var(--sp7);}
+
+/* Add Supplier Panel */
+
+/* Purchase Orders section */
+.po-section-head{display:flex;align-items:center;justify-content:space-between;margin:32px 0 14px;}
+.po-section-title{font-size:16px;font-weight:900;color:var(--sp9);}
+.po-section-sub{font-size:12px;color:var(--txt2);font-weight:600;margin-top:2px;}
+.btn-add.ghost{background:#fff;color:var(--sp8);border:1.5px solid var(--border-s,rgba(0,0,0,0.14));box-shadow:none;}
+.btn-add.ghost:hover{background:var(--sp0);}
+
+.po-list{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+.po-head-row{
+  display:grid;grid-template-columns:1.3fr 1.4fr 1.6fr 0.9fr 1fr 1.1fr;
+  padding:14px 20px;background:#FAFAF7;border-bottom:1px solid var(--border);
+}
+.po-head-cell{font-size:10.5px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:0.06em;}
+.po-row{
+  display:grid;grid-template-columns:1.3fr 1.4fr 1.6fr 0.9fr 1fr 1.1fr;
+  padding:14px 20px;align-items:center;border-bottom:1px solid #F4F3EE;gap:8px;
+}
+.po-row:last-child{border-bottom:none;}
+.po-id{font-size:13px;font-weight:800;color:var(--txt);}
+.po-date{font-size:11px;color:var(--txt2);margin-top:1px;}
+.po-supplier{font-size:13px;font-weight:700;color:var(--txt);}
+.po-items-summary{font-size:12.5px;color:var(--txt2);font-weight:600;}
+.po-total{font-size:13.5px;font-weight:800;color:var(--sp9);}
+.po-action-btn{
+  height:36px;padding:0 14px;border-radius:10px;border:none;background:var(--sp8);color:#fff;
+  font-size:12px;font-weight:800;cursor:pointer;transition:background 0.15s;
+}
+.po-action-btn:hover{background:var(--sp7);}
+.po-action-btn:disabled{background:#ECFDF3;color:var(--green5);cursor:default;}
+.po-empty{padding:40px 20px;text-align:center;color:var(--txt2);font-size:13px;font-weight:600;}
+
+/* Item rows inside the Create PO panel */
+.po-item-row{display:grid;grid-template-columns:1fr 62px 78px 32px;gap:8px;align-items:center;margin-bottom:10px;}
+.po-item-row input{
+  height:42px;border:1.5px solid #E5E7EB;border-radius:10px;padding:0 10px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;color:var(--txt);
+  background:#FAFAFA;outline:none;transition:border-color 0.18s;width:100%;
+}
+.po-item-row input:focus{border-color:var(--sp5);background:#fff;}
+.po-item-remove{
+  width:32px;height:32px;border-radius:9px;border:none;background:var(--red0);color:var(--red5);
+  font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.btn-add-item{
+  width:100%;height:42px;border-radius:10px;border:1.5px dashed var(--border-s,rgba(0,0,0,0.14));background:#fff;
+  color:var(--sp7);font-size:12.5px;font-weight:700;cursor:pointer;margin-bottom:18px;
+}
+.btn-add-item:hover{background:var(--sp0);}
+.po-total-row{
+  display:flex;justify-content:space-between;align-items:center;padding:14px 16px;
+  background:var(--g0);border:1.5px solid rgba(245,166,35,0.3);border-radius:14px;margin-top:4px;
+}
+.po-total-label{font-size:12px;font-weight:800;color:#92600A;text-transform:uppercase;letter-spacing:0.04em;}
+.po-total-value{font-size:20px;font-weight:900;color:var(--sp9);}
+
+/* Item rows inside the Receive Stock panel */
+.rc-item-row{padding:14px 0;border-bottom:1px solid #F4F3EE;}
+.rc-item-row:last-child{border-bottom:none;}
+.rc-item-name{font-size:13.5px;font-weight:800;color:var(--txt);}
+.rc-item-meta{font-size:11px;color:var(--txt2);margin-top:2px;margin-bottom:8px;}
+.rc-item-row input{
+  width:100px;height:40px;border:1.5px solid #E5E7EB;border-radius:10px;padding:0 12px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--txt);
+  background:#FAFAFA;outline:none;transition:border-color 0.18s;
+}
+.rc-item-row input:focus{border-color:var(--sp5);background:#fff;}
+.overlay{
+  position:fixed;inset:0;background:rgba(12,51,38,0.35);z-index:90;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;
+}
+.overlay.show{opacity:1;pointer-events:auto;}
+
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:420px;max-width:92vw;
+  background:#fff;z-index:91;box-shadow:-8px 0 40px rgba(12,51,38,0.15);
+  transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;
+}
+.panel.show{transform:translateX(0);}
+
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 24px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.panel-title{font-size:18px;font-weight:900;color:var(--sp9);}
+.panel-close{
+  width:36px;height:36px;border-radius:10px;border:none;background:#F4F3EE;
+  display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:18px;cursor:pointer;
+  transition:background 0.15s;
+}
+.panel-close:hover{background:#ECEAE2;}
+
+.panel-body{flex:1;overflow-y:auto;padding:22px 24px;}
+
+.field{margin-bottom:18px;}
+.f-label{display:block;font-size:12px;font-weight:700;color:var(--txt);margin-bottom:7px;}
+.f-input{
+  width:100%;height:48px;border:1.5px solid #E5E7EB;border-radius:12px;padding:0 14px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:500;color:var(--txt);
+  background:#FAFAFA;outline:none;transition:border-color 0.18s;
+}
+.f-input:focus{border-color:var(--sp5);background:#fff;box-shadow:0 0 0 4px rgba(30,138,99,0.08);}
+
+.panel-footer{padding:18px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:12px;}
+.btn-cancel{
+  flex:1;height:48px;border-radius:13px;background:#F4F3EE;color:var(--sp8);border:none;
+  font-size:13.5px;font-weight:700;cursor:pointer;transition:background 0.15s;
+}
+.btn-cancel:hover{background:#ECEAE2;}
+.btn-save{
+  flex:1.6;height:48px;border-radius:13px;background:var(--sp8);color:#fff;border:none;
+  font-size:13.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background 0.15s;
+}
+.btn-save:hover{background:var(--sp7);}
+
+/* Toast */
+.toast-container{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;
+}
+.toast{
+  background:#0F3D2E;color:#fff;padding:14px 24px;border-radius:14px;
+  font-size:14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(20px);
+  transition:all 0.3s ease;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* Bottom Nav */
+.bottom-nav{display:none;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .content{padding:20px 16px 90px;}
+  .topbar{padding:16px 18px;}
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+  .supplier-grid{grid-template-columns:1fr;}
+  .panel{width:100%;max-width:100%;}
+
+  .po-head-row{display:none;}
+  .po-row{
+    grid-template-columns:1fr;
+    grid-template-areas:"id" "supplier" "items" "total" "status" "action";
+    row-gap:6px;padding:16px 18px;
+  }
+  .po-row .po-id-wrap{grid-area:id;}
+  .po-row .po-supplier{grid-area:supplier;}
+  .po-row .po-items-summary{grid-area:items;}
+  .po-row .po-total{grid-area:total;}
+  .po-row .status-badge{grid-area:status;justify-self:start;}
+  .po-row .po-action-btn{grid-area:action;justify-self:start;}
+  .po-section-head{flex-direction:column;align-items:flex-start;gap:10px;}
+  .po-section-head .btn-add{width:100%;justify-content:center;}
+  
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:#EBF6F1;border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    justify-content:space-around;align-items:center;
+    box-shadow:0 -4px 20px rgba(12,51,38,0.06);
+  }
+  .bn-item{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--txt2);font-size:9.5px;font-weight:700;padding:6px 10px;cursor:pointer;
+  }
+  .bn-item i{font-size:21px;}
+  .bn-item.active{color:var(--sp7);}
+  .bn-item.fab{
+    background:var(--sp8);color:#fff;width:50px;height:50px;border-radius:16px;
+    margin-top:-28px;justify-content:center;box-shadow:0 6px 16px rgba(15,61,46,0.35);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-logo" data-nav="dashboard.html">
+      <div class="sb-logo-box"><img src="SPlogo.png" alt="StorePilot"></div>
+      <div>
+        <div class="sb-logo-name">Store<span>Pilot</span></div>
+        <div class="sb-logo-sub">Kirana Business OS</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item" data-nav="dashboard.html"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sb-item" data-nav="inventory.html"><i class="ti ti-package"></i> Inventory</div>
+      <div class="sb-item" data-nav="billing.html"><i class="ti ti-receipt"></i> Billing</div>
+      <div class="sb-item" data-nav="customers.html"><i class="ti ti-users"></i> Customers</div>
+      <div class="sb-item active" data-nav="suppliers.html"><i class="ti ti-truck"></i> Suppliers</div>
+      <div class="sb-item" data-nav="predictions.html"><i class="ti ti-bulb"></i> Predictions</div>
+      <div class="sb-item" data-nav="reports.html"><i class="ti ti-file-analytics"></i> Reports</div>
+      <div class="sb-item" data-nav="settings.html"><i class="ti ti-settings"></i> Settings</div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user" data-action="profile">
+        <div class="sb-avatar">SK</div>
+        <div>
+          <div class="sb-user-name">Sudip Kale</div>
+          <div class="sb-user-shop">Sharma General Store</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-eyebrow">Supplier Management</div>
+        <div class="tb-title">Suppliers</div>
+      </div>
+      <div class="tb-actions">
+        <a href="alerts.html" class="tb-icon-btn"><i class="ti ti-bell" aria-hidden="true"></i></a>
+        <a href="predictions.html" class="tb-icon-btn"><i class="ti ti-bulb" aria-hidden="true"></i></a>
+        <a href="settings.html" class="tb-icon-btn"><i class="ti ti-settings" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="stat-strip">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="ti ti-truck"></i></div>
+          <div>
+            <div class="stat-val" id="statSuppliers">18</div>
+            <div class="stat-label">Total Suppliers</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="ti ti-clock"></i></div>
+          <div>
+            <div class="stat-val" id="pendingOrdersStat">4</div>
+            <div class="stat-label">Pending Orders</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold"><i class="ti ti-package"></i></div>
+          <div>
+            <div class="stat-val" id="statPurchase">₹1.2L</div>
+            <div class="stat-label">This Month Purchase</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="ti ti-alert-triangle"></i></div>
+          <div>
+            <div class="stat-val" id="statLowStock">2</div>
+            <div class="stat-label">Low Stock Alerts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="ti ti-search search-icon"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search suppliers...">
+        </div>
+        <button class="btn-add ghost" id="newPoBtn" type="button">
+          <i class="ti ti-clipboard-plus"></i> New PO
+        </button>
+        <button class="btn-add" id="addSupplierBtn">
+          <i class="ti ti-plus"></i> Add Supplier
+        </button>
+      </div>
+
+      <div class="supplier-grid" id="supplierGrid">
+
+        <div class="sup-card" data-id="1">
+          <div class="sup-header">
+            <div class="sup-avatar"><i class="ti ti-building-store"></i></div>
+            <div class="sup-info">
+              <div class="sup-name">Amul Dairy</div>
+              <div class="sup-phone">+91 98765 11122</div>
+            </div>
+          </div>
+          <div class="sup-meta">
+            <div><strong>12</strong> products</div>
+            <div>Last: <strong id="lastDate-1">28 Jun</strong></div>
+          </div>
+          <div class="sup-actions">
+            <button class="action-btn" onclick="sendReminder(this)"><i class="ti ti-message-circle"></i> Contact</button>
+            <button class="action-btn primary" onclick="openCreatePOPanel(1)"><i class="ti ti-package"></i> Receive</button>
+          </div>
+          <div class="po-pending" id="poPending-1"></div>
+        </div>
+
+        <div class="sup-card" data-id="2">
+          <div class="sup-header">
+            <div class="sup-avatar"><i class="ti ti-building-store"></i></div>
+            <div class="sup-info">
+              <div class="sup-name">ITC Foods</div>
+              <div class="sup-phone">+91 87654 33344</div>
+            </div>
+          </div>
+          <div class="sup-meta">
+            <div><strong>28</strong> products</div>
+            <div>Last: <strong>25 Jun</strong></div>
+          </div>
+          <div class="sup-actions">
+            <button class="action-btn" onclick="sendReminder(this)"><i class="ti ti-message-circle"></i> Contact</button>
+            <button class="action-btn primary" onclick="receiveStock(this)"><i class="ti ti-package"></i> Receive</button>
+          </div>
+        </div>
+
+        <div class="sup-card" data-id="3">
+          <div class="sup-header">
+            <div class="sup-avatar"><i class="ti ti-building-store"></i></div>
+            <div class="sup-info">
+              <div class="sup-name">Patanjali</div>
+              <div class="sup-phone">+91 99887 55566</div>
+            </div>
+          </div>
+          <div class="sup-meta">
+            <div><strong>9</strong> products</div>
+            <div>Last: <strong>20 Jun</strong></div>
+          </div>
+          <div class="sup-actions">
+            <button class="action-btn" onclick="sendReminder(this)"><i class="ti ti-message-circle"></i> Contact</button>
+            <button class="action-btn primary" onclick="receiveStock(this)"><i class="ti ti-package"></i> Receive</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-title">Add New Supplier</div>
+    <button class="panel-close" id="panelClose"><i class="ti ti-x"></i></button>
+  </div>
+
+  <div class="panel-body">
+    <div class="field">
+      <label class="f-label">Company Name</label>
+      <input type="text" class="f-input" id="supName" placeholder="e.g. Nestle India">
+    </div>
+    <div class="field">
+      <label class="f-label">Phone Number</label>
+      <input type="tel" class="f-input" id="supPhone" placeholder="+91 98765 43210">
+    </div>
+    <div class="field">
+      <label class="f-label">Products Supplied</label>
+      <input type="text" class="f-input" id="supProducts" placeholder="Milk, Ghee, Butter">
+    </div>
+  </div>
+
+  <div class="panel-footer">
+    <button class="btn-cancel" id="panelCancel">Cancel</button>
+    <button class="btn-save" id="panelSave"><i class="ti ti-check"></i> Add Supplier</button>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
+  <a href="inventory.html" class="bn-item"><i class="ti ti-package"></i><span>Stock</span></a>
+  <a href="billing.html" class="bn-item fab"><i class="ti ti-receipt"></i></a>
+  <a href="customers.html" class="bn-item"><i class="ti ti-users"></i><span>Udhar</span></a>
+  <a href="suppliers.html" class="bn-item active"><i class="ti ti-truck"></i><span>Suppliers</span></a>
+</nav>
+
+<script>
+const API = "http://127.0.0.1:8000/api/v1";
+const token = () => localStorage.getItem("token");
+const hdrs = () => ({ "Content-Type": "application/json", "Authorization": `Bearer ${token()}` });
+const formatRs = n => "\u20B9" + Number(n).toLocaleString("en-IN");
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.innerHTML = `<i class="ti ti-check" style="font-size:18px;"></i><span>${msg}</span>`;
+  document.getElementById("toastContainer").appendChild(t);
+  setTimeout(() => t.classList.add("show"), 50);
+  setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 300); }, 2600);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/suppliers/stats`, { headers: hdrs() });
+    if (!res.ok) return;
+    const s = await res.json();
+    document.getElementById("statSuppliers").textContent = s.total_suppliers;
+    document.getElementById("pendingOrdersStat").textContent = s.pending_orders;
+    document.getElementById("statPurchase").textContent = formatRs(s.this_month_purchase);
+    document.getElementById("statLowStock").textContent = s.low_stock_alerts;
+  } catch(e) {}
+}
+
+// ── RENDER SUPPLIERS ──────────────────────────────────────────────────────
+let suppliersCache = [];
+
+function renderSuppliers(list) {
+  const grid = document.getElementById("supplierGrid");
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--txt2);font-size:14px;font-weight:600;">No suppliers yet. Add your first supplier!</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(s => `
+    <div class="sup-card" data-id="${s.supplier_id}">
+      <div class="sup-header">
+        <div class="sup-avatar"><i class="ti ti-building-store"></i></div>
+        <div class="sup-info">
+          <div class="sup-name">${s.name}</div>
+          <div class="sup-phone">${s.phone}</div>
+        </div>
+      </div>
+      <div class="sup-meta">
+        <div>${s.address || "No address"}</div>
+        <div>Added: <strong>${new Date(s.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short"})}</strong></div>
+      </div>
+      <div class="sup-actions">
+        <button class="action-btn" onclick="sendReminder(this)"><i class="ti ti-message-circle"></i> Contact</button>
+        <button class="action-btn primary" onclick="openNewPO(${s.supplier_id}, '${s.name}')"><i class="ti ti-clipboard-plus"></i> New PO</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function loadSuppliers(search = "") {
+  try {
+    const url = search ? `${API}/suppliers?search=${encodeURIComponent(search)}` : `${API}/suppliers`;
+    const res = await fetch(url, { headers: hdrs() });
+    if (!res.ok) return;
+    suppliersCache = await res.json();
+    renderSuppliers(suppliersCache);
+  } catch(e) {}
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────
+let searchTimer;
+document.getElementById("searchInput").addEventListener("input", e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadSuppliers(e.target.value.trim()), 300);
+});
+
+// ── CONTACT / REMINDER ────────────────────────────────────────────────────
+function sendReminder(btn) {
+  const name = btn.closest(".sup-card").querySelector(".sup-name").textContent;
+  btn.innerHTML = `<i class="ti ti-check"></i> Sent`;
+  setTimeout(() => { showToast(`Message sent to ${name}`); btn.innerHTML = `<i class="ti ti-message-circle"></i> Contact`; }, 900);
+}
+
+// ── PANEL HELPERS ─────────────────────────────────────────────────────────
+function openPanel() {
+  document.getElementById("panel").classList.add("show");
+  document.getElementById("overlay").classList.add("show");
+}
+function closePanel() {
+  document.getElementById("panel").classList.remove("show");
+  document.getElementById("overlay").classList.remove("show");
+}
+document.getElementById("overlay").addEventListener("click", closePanel);
+document.getElementById("panelClose").addEventListener("click", closePanel);
+
+// ── ADD SUPPLIER PANEL ────────────────────────────────────────────────────
+document.getElementById("addSupplierBtn").addEventListener("click", () => {
+  document.querySelector(".panel-title").innerText = "Add New Supplier";
+  document.querySelector(".panel-body").innerHTML = `
+    <div class="field"><label class="f-label">Company Name</label><input type="text" class="f-input" id="supName" placeholder="e.g. Nestle India"></div>
+    <div class="field"><label class="f-label">Phone Number</label><input type="tel" class="f-input" id="supPhone" placeholder="+91 98765 43210"></div>
+    <div class="field"><label class="f-label">Address (optional)</label><input type="text" class="f-input" id="supAddress" placeholder="City, State"></div>
+    <div class="field"><label class="f-label">GST Number (optional)</label><input type="text" class="f-input" id="supGst" placeholder="22AAAAA0000A1Z5"></div>
+  `;
+  document.querySelector(".panel-footer").innerHTML = `
+    <button class="btn-cancel" id="panelCancel">Cancel</button>
+    <button class="btn-save" id="panelSave"><i class="ti ti-check"></i> Add Supplier</button>
+  `;
+  document.getElementById("panelCancel").addEventListener("click", closePanel);
+  document.getElementById("panelSave").addEventListener("click", async () => {
+    const name = document.getElementById("supName").value.trim();
+    const phone = document.getElementById("supPhone").value.trim();
+    const address = document.getElementById("supAddress").value.trim();
+    const gst = document.getElementById("supGst").value.trim();
+    if (!name || !phone) { showToast("Please enter name and phone"); return; }
+    const btn = document.getElementById("panelSave");
+    btn.textContent = "Saving..."; btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/suppliers`, {
+        method: "POST", headers: hdrs(),
+        body: JSON.stringify({ name, phone, address: address || null, gst_number: gst || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.detail || "Failed to add supplier"); btn.textContent = "Add Supplier"; btn.disabled = false; return; }
+      closePanel(); showToast(`${name} added!`); loadSuppliers(); loadStats();
+    } catch(e) { showToast("Server error"); btn.textContent = "Add Supplier"; btn.disabled = false; }
+  });
+  openPanel();
+});
+
+// ── NEW PO PANEL ──────────────────────────────────────────────────────────
+function openNewPO(supplierId, supplierName) {
+  document.querySelector(".panel-title").innerText = "Create Purchase Order";
+  document.querySelector(".panel-body").innerHTML = `
+    <div class="field">
+      <label class="f-label">Supplier</label>
+      <input type="text" class="f-input" value="${supplierName}" readonly style="background:#F4F4F4;">
+    </div>
+    <div class="field">
+      <label class="f-label">Expected Delivery Date (optional)</label>
+      <input type="date" class="f-input" id="poExpDate">
+    </div>
+    <div class="field">
+      <label class="f-label">Items to Order</label>
+      <div id="poItemsContainer">
+        <div class="po-item-row">
+          <input type="number" placeholder="Product ID" class="po-pid">
+          <input type="number" placeholder="Qty" class="po-qty">
+          <input type="number" placeholder="Cost (\u20B9)" class="po-cost">
+          <button type="button" class="po-item-remove" onclick="this.parentElement.remove()"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+      <button type="button" class="btn-add-item" id="addItemRowBtn"><i class="ti ti-plus"></i> Add Item</button>
+    </div>
+    <div style="padding:10px 0;font-size:11px;color:var(--txt2);">Tip: Use the product_id from Inventory page for each item.</div>
+  `;
+  document.querySelector(".panel-footer").innerHTML = `
+    <button class="btn-cancel" id="poCancelBtn">Cancel</button>
+    <button class="btn-save" id="poSaveBtn"><i class="ti ti-check"></i> Create PO</button>
+  `;
+  document.getElementById("poCancelBtn").addEventListener("click", closePanel);
+  document.getElementById("addItemRowBtn").addEventListener("click", () => {
+    const row = document.createElement("div");
+    row.className = "po-item-row";
+    row.innerHTML = `
+      <input type="number" placeholder="Product ID" class="po-pid">
+      <input type="number" placeholder="Qty" class="po-qty">
+      <input type="number" placeholder="Cost (\u20B9)" class="po-cost">
+      <button type="button" class="po-item-remove" onclick="this.parentElement.remove()"><i class="ti ti-trash"></i></button>
+    `;
+    document.getElementById("poItemsContainer").appendChild(row);
+  });
+  document.getElementById("poSaveBtn").addEventListener("click", async () => {
+    const rows = document.querySelectorAll(".po-item-row");
+    const items = [];
+    let valid = true;
+    rows.forEach(row => {
+      const pid = parseInt(row.querySelector(".po-pid").value);
+      const qty = parseInt(row.querySelector(".po-qty").value);
+      const cost = parseFloat(row.querySelector(".po-cost").value);
+      if (pid && qty > 0 && cost >= 0) items.push({ product_id: pid, quantity_ordered: qty, unit_cost: cost });
+      else if (pid || qty || cost) valid = false;
+    });
+    if (!valid || !items.length) { showToast("Please fill all item rows correctly"); return; }
+    const expDate = document.getElementById("poExpDate").value || null;
+    const btn = document.getElementById("poSaveBtn");
+    btn.textContent = "Creating..."; btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/purchase-orders`, {
+        method: "POST", headers: hdrs(),
+        body: JSON.stringify({ supplier_id: supplierId, items, expected_date: expDate }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.detail || "Failed to create PO"); btn.textContent = "Create PO"; btn.disabled = false; return; }
+      closePanel(); showToast(`PO #${data.po_id} created for ${supplierName}!`); loadStats();
+    } catch(e) { showToast("Server error"); btn.textContent = "Create PO"; btn.disabled = false; }
+  });
+  openPanel();
+}
+
+// Also wire the global New PO button — shows supplier picker first
+document.getElementById("newPoBtn").addEventListener("click", () => {
+  if (!suppliersCache.length) { showToast("Add a supplier first"); return; }
+  document.querySelector(".panel-title").innerText = "Select Supplier";
+  document.querySelector(".panel-body").innerHTML = `
+    <div class="field">
+      <label class="f-label">Choose Supplier</label>
+      <select class="f-input" id="poSupplierSelect">
+        <option value="">-- Select --</option>
+        ${suppliersCache.map(s => `<option value="${s.supplier_id}" data-name="${s.name}">${s.name}</option>`).join("")}
+      </select>
+    </div>
+  `;
+  document.querySelector(".panel-footer").innerHTML = `
+    <button class="btn-cancel" id="poCancelBtn">Cancel</button>
+    <button class="btn-save" id="poNextBtn">Next <i class="ti ti-arrow-right"></i></button>
+  `;
+  document.getElementById("poCancelBtn").addEventListener("click", closePanel);
+  document.getElementById("poNextBtn").addEventListener("click", () => {
+    const sel = document.getElementById("poSupplierSelect");
+    const id = parseInt(sel.value);
+    const name = sel.options[sel.selectedIndex].dataset.name;
+    if (!id) { showToast("Please select a supplier"); return; }
+    openNewPO(id, name);
+  });
+  openPanel();
+});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+document.querySelectorAll("[data-nav]").forEach(el => {
+  el.addEventListener("click", () => { const url = el.getAttribute("data-nav"); if (url) window.location.href = url; });
+});
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+loadStats();
+loadSuppliers();
+
+(function(){
+  const t = localStorage.getItem("token");
+  if (!t) return;
+  fetch("http://127.0.0.1:8000/api/v1/auth/me", {
+    headers: { "Authorization": "Bearer " + t }
+  }).then(r => r.json()).then(d => {
+    const nameEl = document.querySelector(".sb-user-name");
+    const shopEl = document.querySelector(".sb-user-shop");
+    const avEl   = document.querySelector(".sb-avatar");
+    if (nameEl) nameEl.textContent = d.name;
+    if (shopEl) shopEl.textContent = d.store_name;
+    if (avEl)   avEl.textContent   = d.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+  }).catch(()=>{});
+})();
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a14b9f9519ed8001',t:'MTc4Mjk3NDA1Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

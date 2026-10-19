@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+  --red0:#FEF2F2;--red5:#DC2626;
+  --green5:#16A34A;
+  --amber0:#FFFBEB;--amber5:#D97706;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background-color:var(--ivory);
+  background-image:
+    radial-gradient(circle at 95% 0%, rgba(245,166,35,0.04) 0%, transparent 40%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size: auto, 24px 24px;
+  min-height:100vh;
+  color:var(--txt);
+}
+
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;}
+
+/* ─────────────────────────────
+   APP SHELL (shared with dashboard)
+───────────────────────────── */
+.shell{display:flex;min-height:100vh;}
+
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--sp8);
+  display:flex;flex-direction:column;padding:24px 16px;
+  position:sticky;top:0;height:100vh;
+}
+.sb-logo{display:flex;align-items:center;gap:12px;padding:8px 10px 28px;}
+.sb-logo-box{width:40px;height:40px;border-radius:11px;background:#1E8A63;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-logo-box img{width:32px;height:32px;object-fit:contain;display:block;}
+.sb-logo-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1;}
+.sb-logo-name span{color:var(--g4);}
+.sb-logo-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;letter-spacing:0.05em;text-transform:uppercase;}
+
+.sb-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.sb-item{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;
+  font-size:13.5px;font-weight:600;color:rgba(255,255,255,0.55);
+  transition:background 0.15s,color 0.15s;cursor:pointer;position:relative;
+}
+.sb-item i{font-size:18px;flex-shrink:0;width:18px;text-align:center;}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:rgba(245,166,35,0.13);color:#fff;}
+.sb-item.active i{color:var(--g4);}
+.sb-item.active::before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--g5);border-radius:0 3px 3px 0;}
+.sb-badge{margin-left:auto;background:var(--g5);color:var(--sp9);font-size:10px;font-weight:800;border-radius:100px;padding:1px 6px;min-width:16px;text-align:center;}
+
+.sb-footer{border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:10px;}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;cursor:pointer;transition:background 0.15s;}
+.sb-user:hover{background:rgba(255,255,255,0.04);}
+.sb-avatar{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:var(--g5);color:var(--sp9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+.sb-user-name{font-size:12.5px;font-weight:700;color:#fff;line-height:1.2;}
+.sb-user-shop{font-size:10.5px;color:rgba(255,255,255,0.4);margin-top:1px;}
+
+.main{flex:1;min-width:0;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;padding:20px 32px;
+  position:sticky;top:0;z-index:30;background:#FEF3DC;backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.tb-greeting{}
+.tb-hello{font-size:11px;font-weight:700;color:var(--sp5);text-transform:uppercase;letter-spacing:0.08em;}
+.tb-date{font-size:19px;font-weight:800;color:var(--sp9);letter-spacing:-0.3px;margin-top:2px;}
+.tb-actions{display:flex;align-items:center;gap:10px;}
+.tb-icon-btn{
+  width:40px;height:40px;border-radius:11px;background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:18px;cursor:pointer;
+  position:relative;transition:border-color 0.15s,color 0.15s;
+}
+.tb-icon-btn:hover{border-color:var(--border-s);color:var(--sp7);}
+.tb-icon-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--g5);border:1.5px solid #fff;}
+
+.content{padding:28px 32px 100px;}
+
+/* ─────────────────────────────
+   STATS STRIP
+───────────────────────────── */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{
+  background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.stat-icon.green{background:var(--sp0);color:var(--sp5);}
+.stat-icon.red{background:var(--red0);color:var(--red5);}
+.stat-icon.amber{background:var(--amber0);color:var(--amber5);}
+.stat-icon.gold{background:var(--g0);color:#92600A;}
+.stat-val{font-size:22px;font-weight:900;color:var(--sp9);letter-spacing:-0.5px;line-height:1;}
+.stat-label{font-size:11.5px;color:var(--txt2);margin-top:4px;font-weight:600;}
+
+/* ─────────────────────────────
+   TOOLBAR
+───────────────────────────── */
+.toolbar{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;
+}
+.search-wrap{position:relative;flex:1;min-width:220px;}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--txt2);font-size:17px;}
+.search-input{
+  width:100%;height:46px;border:1.5px solid var(--border);border-radius:13px;
+  padding:0 16px 0 44px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:500;
+  background:#fff;outline:none;transition:border-color 0.18s,box-shadow 0.18s;
+}
+.search-input:focus{border-color:var(--sp5);box-shadow:0 0 0 4px rgba(30,138,99,0.08);}
+.search-input::placeholder{color:#B0B7C3;}
+
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.f-chip{
+  height:46px;padding:0 16px;border-radius:13px;border:1.5px solid var(--border);
+  background:#fff;font-size:13px;font-weight:700;color:var(--txt2);cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:border-color 0.15s,background 0.15s,color 0.15s;
+  white-space:nowrap;
+}
+.f-chip:hover{border-color:var(--border-s);}
+.f-chip.active{background:var(--sp8);color:#fff;border-color:var(--sp8);}
+
+.btn-add{
+  height:46px;padding:0 20px;border-radius:13px;border:none;
+  background:var(--sp8);color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:8px;box-shadow:0 6px 16px rgba(15,61,46,0.22);
+  transition:background 0.18s,transform 0.12s;
+  position:relative;overflow:hidden;
+}
+.btn-add::after{
+  content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
+  transform:skewX(-18deg);
+}
+.btn-add:hover{background:var(--sp7);}
+.btn-add:hover::after{left:150%;transition:left 0.5s ease;}
+.btn-add:active{transform:scale(0.97);}
+
+/* ─────────────────────────────
+   PRODUCT TABLE (desktop)
+───────────────────────────── */
+.table-card{
+  background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:24px;
+}
+.t-head-row{
+  display:grid;grid-template-columns:2.4fr 1fr 1fr 1.2fr 1fr 0.7fr;
+  padding:14px 22px;background:#FAFAF7;border-bottom:1px solid var(--border);
+}
+.t-head-cell{font-size:10.5px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:0.06em;}
+
+.t-row{
+  display:grid;grid-template-columns:2.4fr 1fr 1fr 1.2fr 1fr 0.7fr;
+  padding:14px 22px;align-items:center;border-bottom:1px solid #F4F3EE;
+  transition:background 0.12s;cursor:pointer;
+}
+.t-row:last-child{border-bottom:none;}
+.t-row:hover{background:#FAFAF7;}
+
+.p-cell{display:flex;align-items:center;gap:12px;min-width:0;}
+.p-icon{
+  width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.p-icon.grocery{background:var(--sp0);color:var(--sp5);}
+.p-icon.dairy{background:#E6F1FB;color:#185FA5;}
+.p-icon.snacks{background:var(--g0);color:#92600A;}
+.p-icon.personal{background:#F3E8FA;color:#7E3AA3;}
+.p-info{min-width:0;}
+.p-name{font-size:13.5px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-barcode{font-size:11px;color:var(--txt2);margin-top:2px;font-family:monospace;}
+
+.cat-tag{
+  display:inline-block;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:8px;
+  background:#F0EFE9;color:var(--txt2);
+}
+
+.price-val{font-size:13.5px;font-weight:700;color:var(--txt);}
+.price-cost{font-size:11px;color:var(--txt2);margin-top:1px;}
+
+.stock-wrap{display:flex;flex-direction:column;gap:5px;}
+.stock-num{font-size:12.5px;font-weight:700;}
+.stock-num.ok{color:var(--green5);}
+.stock-num.low{color:var(--amber5);}
+.stock-num.out{color:var(--red5);}
+.stock-bar-wrap{width:70px;height:5px;background:#F0F0EA;border-radius:3px;overflow:hidden;}
+.stock-bar{height:100%;border-radius:3px;}
+.stock-bar.ok{background:linear-gradient(90deg,var(--sp5),var(--sp7));}
+.stock-bar.low{background:linear-gradient(90deg,#F5A623,#D97706);}
+.stock-bar.out{background:var(--red5);}
+
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+  padding:5px 10px;border-radius:8px;
+}
+.status-badge.ok{background:#ECFDF3;color:var(--green5);}
+.status-badge.low{background:var(--amber0);color:var(--amber5);}
+.status-badge.out{background:var(--red0);color:var(--red5);}
+.status-badge.exp{background:#FDF2F8;color:#BE185D;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+.row-actions{display:flex;justify-content:flex-end;gap:6px;}
+.row-btn{
+  width:32px;height:32px;border-radius:9px;border:none;background:transparent;
+  display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:16px;cursor:pointer;
+  transition:background 0.15s,color 0.15s;
+}
+.row-btn:hover{background:var(--sp0);color:var(--sp7);}
+
+/* ─────────────────────────────
+   MOBILE PRODUCT CARDS
+───────────────────────────── */
+.mobile-cards{display:none;flex-direction:column;gap:10px;margin-bottom:24px;}
+.m-card{
+  background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.m-card-info{flex:1;min-width:0;}
+.m-card-name{font-size:13.5px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-card-meta{font-size:11px;color:var(--txt2);margin-top:2px;}
+.m-card-right{text-align:right;flex-shrink:0;}
+.m-card-price{font-size:13.5px;font-weight:800;color:var(--sp9);}
+
+/* ─────────────────────────────
+   ADD PRODUCT SLIDE-IN PANEL
+───────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(12,51,38,0.35);z-index:90;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;
+}
+.overlay.show{opacity:1;pointer-events:auto;}
+
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:440px;max-width:92vw;
+  background:#fff;z-index:91;box-shadow:-8px 0 40px rgba(12,51,38,0.15);
+  transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;
+}
+.panel.show{transform:translateX(0);}
+
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 24px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.panel-title{font-size:18px;font-weight:900;color:var(--sp9);}
+.panel-close{
+  width:36px;height:36px;border-radius:10px;border:none;background:#F4F3EE;
+  display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:18px;cursor:pointer;
+  transition:background 0.15s;
+}
+.panel-close:hover{background:#ECEAE2;}
+
+.panel-body{flex:1;overflow-y:auto;padding:22px 24px;}
+
+.field{margin-bottom:16px;}
+.f-label{display:block;font-size:12px;font-weight:700;color:var(--txt);margin-bottom:7px;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.f-input{
+  width:100%;height:48px;border:1.5px solid #E5E7EB;border-radius:12px;padding:0 14px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:500;color:var(--txt);
+  background:#FAFAFA;outline:none;transition:border-color 0.18s,background 0.18s,box-shadow 0.18s;
+}
+.f-input::placeholder{color:#C5CAD3;}
+.f-input:focus{border-color:var(--sp5);background:#fff;box-shadow:0 0 0 4px rgba(30,138,99,0.08);}
+select.f-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+
+.barcode-row{display:flex;gap:10px;}
+.barcode-row .f-input{flex:1;}
+.scan-btn{
+  width:48px;height:48px;border-radius:12px;border:1.5px solid var(--sp5);background:var(--sp0);
+  color:var(--sp7);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  flex-shrink:0;transition:background 0.15s;
+}
+.scan-btn:hover{background:#DDF0E5;}
+
+.panel-footer{padding:18px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:12px;}
+.btn-cancel{
+  flex:1;height:48px;border-radius:13px;background:#F4F3EE;color:var(--sp8);border:none;
+  font-size:13.5px;font-weight:700;cursor:pointer;transition:background 0.15s;
+}
+.btn-cancel:hover{background:#ECEAE2;}
+.btn-save{
+  flex:1.6;height:48px;border-radius:13px;background:var(--sp8);color:#fff;border:none;
+  font-size:13.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background 0.15s;
+}
+.btn-save:hover{background:var(--sp7);}
+
+/* ─────────────────────────────
+   MOBILE BOTTOM NAV
+───────────────────────────── */
+.bottom-nav{display:none;}
+
+/* ─────────────────────────────
+   RESPONSIVE
+───────────────────────────── */
+@media(max-width:1100px){
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .content{padding:20px 16px 90px;}
+  .topbar{padding:16px 18px;}
+  .table-card{display:none;}
+  .mobile-cards{display:flex;}
+  .toolbar{flex-direction:column;align-items:stretch;}
+  .btn-add{width:100%;justify-content:center;}
+  .panel{width:100%;max-width:100%;}
+
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:#EBF6F1;border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    justify-content:space-around;align-items:center;
+    box-shadow:0 -4px 20px rgba(12,51,38,0.06);
+  }
+  .bn-item{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--txt2);font-size:9.5px;font-weight:700;padding:6px 10px;border-radius:12px;
+    position:relative;cursor:pointer;transition:color 0.15s;
+  }
+  .bn-item i{font-size:21px;}
+  .bn-item.active{color:var(--sp7);}
+  .bn-item.fab{
+    background:var(--sp8);color:#fff;width:50px;height:50px;border-radius:16px;
+    margin-top:-28px;justify-content:center;box-shadow:0 6px 16px rgba(15,61,46,0.35);
+  }
+  .bn-item.fab i{font-size:22px;}
+  .bn-item.fab span{display:none;}
+  .bn-dot{position:absolute;top:2px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--g5);}
+}
+
+@media(max-width:560px){
+  .stat-strip{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{padding:14px;flex-direction:column;align-items:flex-start;gap:10px;}
+  .f-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ════════ SIDEBAR ════════ -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-box"><img src="SPlogo.png" alt="StorePilot"></div>
+      <div class="sb-logo-text">
+        <div class="sb-logo-name">Store<span>Pilot</span></div>
+        <div class="sb-logo-sub">Kirana Business OS</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a href="dashboard.html" class="sb-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</a>
+      <a href="inventory.html" class="sb-item active"><i class="ti ti-package" aria-hidden="true"></i> Inventory</a>
+      <a href="billing.html" class="sb-item"><i class="ti ti-receipt" aria-hidden="true"></i> Billing</a>
+      <a href="customers.html" class="sb-item"><i class="ti ti-users" aria-hidden="true"></i> Customers</a>
+      <a href="suppliers.html" class="sb-item"><i class="ti ti-truck" aria-hidden="true"></i> Suppliers</a>
+      <a href="predictions.html" class="sb-item"><i class="ti ti-bulb" aria-hidden="true"></i> Predictions</a>
+      <a href="reports.html" class="sb-item"><i class="ti ti-file-analytics" aria-hidden="true"></i> Reports</a>
+      <a href="settings.html" class="sb-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</a>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">SK</div>
+        <div>
+          <div class="sb-user-name">Sudip Kale</div>
+          <div class="sb-user-shop">Sharma General Store</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ════════ MAIN ════════ -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="tb-greeting">
+        <div class="tb-hello">Inventory</div>
+        <div class="tb-date">Manage your products</div>
+      </div>
+      <div class="tb-actions">
+        <a href="alerts.html" class="tb-icon-btn"><i class="ti ti-bell" aria-hidden="true"></i></a>
+        <a href="predictions.html" class="tb-icon-btn"><i class="ti ti-bulb" aria-hidden="true"></i></a>
+        <a href="settings.html" class="tb-icon-btn"><i class="ti ti-settings" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── STATS STRIP ── -->
+      <div class="stat-strip">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="ti ti-package" aria-hidden="true"></i></div>
+          <div>
+            <div class="stat-val" id="statTotal">142</div>
+            <div class="stat-label">Total products</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+          <div>
+            <div class="stat-val" id="statLow">8</div>
+            <div class="stat-label">Low stock items</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="ti ti-clock-exclamation" aria-hidden="true"></i></div>
+          <div>
+            <div class="stat-val" id="statExp">3</div>
+            <div class="stat-label">Expiring soon</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold"><i class="ti ti-cash" aria-hidden="true"></i></div>
+          <div>
+            <div class="stat-val" id="statVal">₹2.4L</div>
+            <div class="stat-label">Inventory value</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TOOLBAR ── -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="ti ti-search search-icon" aria-hidden="true"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search by product name or barcode...">
+        </div>
+        <div class="filter-chips">
+          <div class="f-chip active" data-filter="all">All</div>
+          <div class="f-chip" data-filter="grocery">Grocery</div>
+          <div class="f-chip" data-filter="dairy">Dairy</div>
+          <div class="f-chip" data-filter="snacks">Snacks</div>
+          <div class="f-chip" data-filter="personal">Personal Care</div>
+        </div>
+        <button class="btn-add" id="addProductBtn">
+          <i class="ti ti-plus" aria-hidden="true"></i> Add product
+        </button>
+      </div>
+
+      <!-- ── DESKTOP TABLE ── -->
+      <div class="table-card">
+        <div class="t-head-row">
+          <div class="t-head-cell">Product</div>
+          <div class="t-head-cell">Category</div>
+          <div class="t-head-cell">Price</div>
+          <div class="t-head-cell">Stock</div>
+          <div class="t-head-cell">Status</div>
+          <div class="t-head-cell"></div>
+        </div>
+
+        <div id="tableBody"></div>
+      </div>
+
+      <div class="mobile-cards" id="mobileCards"></div>
+
+
+    </div>
+  </main>
+</div>
+
+<!-- Mobile Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bn-item"><i class="ti ti-layout-dashboard"></i><span>Home</span></a>
+  <a href="inventory.html" class="bn-item active"><i class="ti ti-package"></i><span>Stock</span></a>
+  <a href="billing.html" class="bn-item fab"><i class="ti ti-receipt"></i></a>
+  <a href="customers.html" class="bn-item"><i class="ti ti-users"></i><span>Udhar</span></a>
+  <a href="suppliers.html" class="bn-item"><i class="ti ti-truck"></i><span>Suppliers</span></a>
+</nav>
+
+<!-- ════════ ADD PRODUCT PANEL ════════ -->
+<div class="overlay" id="overlay"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-title">Add new product</div>
+    <button class="panel-close" id="panelClose"><i class="ti ti-x" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="panel-body">
+
+    <div class="field">
+      <label class="f-label" for="prodName">Product name</label>
+      <input type="text" class="f-input" id="prodName" placeholder="e.g. Aashirvaad Atta 5kg">
+    </div>
+
+    <div class="field">
+      <label class="f-label" for="prodCategory">Category</label>
+      <select class="f-input" id="prodCategory">
+        <option value="">Select a category</option>
+        <option value="grocery">Grocery</option>
+        <option value="dairy">Dairy</option>
+        <option value="snacks">Snacks</option>
+        <option value="personal">Personal Care</option>
+        <option value="beverages">Beverages</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="f-label" for="prodBarcode">Barcode</label>
+      <div class="barcode-row">
+        <input type="text" class="f-input" id="prodBarcode" placeholder="Scan or type barcode number">
+        <button class="scan-btn" id="scanBtn" aria-label="Scan barcode"><i class="ti ti-barcode" aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="f-row">
+        <div>
+          <label class="f-label" for="prodPrice">Selling price (₹)</label>
+          <input type="number" class="f-input" id="prodPrice" placeholder="0">
+        </div>
+        <div>
+          <label class="f-label" for="prodCost">Cost price (₹)</label>
+          <input type="number" class="f-input" id="prodCost" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="f-row">
+        <div>
+          <label class="f-label" for="prodStock">Opening stock</label>
+          <input type="number" class="f-input" id="prodStock" placeholder="0">
+        </div>
+        <div>
+          <label class="f-label" for="prodReorder">Reorder level</label>
+          <input type="number" class="f-input" id="prodReorder" placeholder="5">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="f-row">
+        <div>
+          <label class="f-label" for="prodGst">GST rate (%)</label>
+          <select class="f-input" id="prodGst">
+            <option value="0">0%</option>
+            <option value="5" selected>5%</option>
+            <option value="12">12%</option>
+            <option value="18">18%</option>
+            <option value="28">28%</option>
+          </select>
+        </div>
+        <div>
+          <label class="f-label" for="prodExpiry">Expiry date (optional)</label>
+          <input type="date" class="f-input" id="prodExpiry">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel-footer">
+    <button class="btn-cancel" id="panelCancel">Cancel</button>
+    <button class="btn-save" id="panelSave"><i class="ti ti-check" aria-hidden="true"></i> Save product</button>
+  </div>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000/api/v1";
+const token = () => localStorage.getItem("token");
+const hdrs = () => ({ "Content-Type": "application/json", "Authorization": `Bearer ${token()}` });
+const formatRs = n => "\u20B9" + Number(n).toLocaleString("en-IN");
+
+// ── CATEGORY CONFIG ────────────────────────────────────────────────────────
+const catIcon = { grocery: "ti-plant", dairy: "ti-bottle", snacks: "ti-cookie", personal: "ti-droplet", beverages: "ti-cup" };
+const catLabel = { grocery: "Grocery", dairy: "Dairy", snacks: "Snacks", personal: "Personal Care", beverages: "Beverages" };
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let allProducts = [];
+let currentFilter = "all";
+let searchQuery = "";
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/inventory/stats`, { headers: hdrs() });
+    if (!res.ok) return;
+    const s = await res.json();
+    document.getElementById("statTotal").textContent = s.total_products;
+    document.getElementById("statLow").textContent = s.low_stock_count;
+    document.getElementById("statExp").textContent = s.expiring_soon_count;
+    const val = Number(s.total_inventory_value);
+    document.getElementById("statVal").textContent = val >= 100000
+      ? "\u20B9" + (val/100000).toFixed(1) + "L"
+      : formatRs(val);
+  } catch(e) {}
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function stockBarWidth(stock, reorder) {
+  if (stock === 0) return 0;
+  const max = Math.max(stock, reorder * 3, 30);
+  return Math.min(100, Math.round((stock / max) * 100));
+}
+
+function statusBadge(p) {
+  if (p.stock_status === "out") return `<span class="status-badge out"><span class="status-dot"></span> Out of stock</span>`;
+  if (p.stock_status === "low") return `<span class="status-badge low"><span class="status-dot"></span> Low stock</span>`;
+  if (p.expiry_date) {
+    const days = Math.round((new Date(p.expiry_date) - new Date()) / 86400000);
+    if (days <= 30) return `<span class="status-badge exp"><span class="status-dot"></span> Expires in ${days}d</span>`;
+  }
+  return `<span class="status-badge ok"><span class="status-dot"></span> In stock</span>`;
+}
+
+function renderTable(products) {
+  const body = document.getElementById("tableBody");
+  if (!products.length) {
+    body.innerHTML = `<div style="padding:40px;text-align:center;color:var(--txt2);font-size:14px;font-weight:600;">No products found.</div>`;
+    return;
+  }
+  body.innerHTML = products.map(p => {
+    const cat = (p.category || "grocery").toLowerCase();
+    const icon = catIcon[cat] || "ti-package";
+    const sw = stockBarWidth(p.current_stock, p.reorder_level);
+    const sClass = p.stock_status;
+    return `<div class="t-row" data-category="${cat}" data-id="${p.product_id}">
+      <div class="p-cell">
+        <div class="p-icon ${cat}"><i class="ti ${icon}"></i></div>
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-barcode">${p.barcode || "No barcode"}</div>
+        </div>
+      </div>
+      <div><span class="cat-tag">${catLabel[cat] || cat}</span></div>
+      <div>
+        <div class="price-val">${formatRs(p.selling_price)}</div>
+        <div class="price-cost">Cost ${formatRs(p.cost_price)}</div>
+      </div>
+      <div class="stock-wrap">
+        <div class="stock-num ${sClass}">${p.current_stock} units</div>
+        <div class="stock-bar-wrap"><div class="stock-bar ${sClass}" style="width:${sw}%"></div></div>
+      </div>
+      <div>${statusBadge(p)}</div>
+      <div class="row-actions">
+        <button class="row-btn" onclick="openStockIn(${p.product_id},'${p.name}')"><i class="ti ti-package-import"></i></button>
+        <button class="row-btn"><i class="ti ti-edit"></i></button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderMobile(products) {
+  const mob = document.getElementById("mobileCards");
+  if (!products.length) { mob.innerHTML = ""; return; }
+  mob.innerHTML = products.map(p => {
+    const cat = (p.category || "grocery").toLowerCase();
+    const icon = catIcon[cat] || "ti-package";
+    const sClass = p.stock_status;
+    const sLabel = sClass === "out" ? "Out" : sClass === "low" ? "Low" : "OK";
+    return `<div class="m-card" data-category="${cat}">
+      <div class="p-icon ${cat}"><i class="ti ${icon}"></i></div>
+      <div class="m-card-info">
+        <div class="m-card-name">${p.name}</div>
+        <div class="m-card-meta">${p.current_stock} units &middot; ${catLabel[cat] || cat}</div>
+      </div>
+      <div class="m-card-right">
+        <div class="m-card-price">${formatRs(p.selling_price)}</div>
+        <span class="status-badge ${sClass}" style="margin-top:4px;"><span class="status-dot"></span> ${sLabel}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function applyFilters() {
+  let list = allProducts;
+  if (currentFilter !== "all") list = list.filter(p => (p.category || "").toLowerCase() === currentFilter);
+  if (searchQuery) list = list.filter(p =>
+    p.name.toLowerCase().includes(searchQuery) ||
+    (p.barcode || "").toLowerCase().includes(searchQuery)
+  );
+  renderTable(list);
+  renderMobile(list);
+}
+
+// ── LOAD PRODUCTS ──────────────────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const res = await fetch(`${API}/products`, { headers: hdrs() });
+    if (!res.ok) return;
+    allProducts = await res.json();
+    applyFilters();
+  } catch(e) {
+    document.getElementById("tableBody").innerHTML =
+      `<div style="padding:40px;text-align:center;color:var(--txt2);">Could not load products. Check server.</div>`;
+  }
+}
+
+// ── SEARCH & FILTER ────────────────────────────────────────────────────────
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  applyFilters();
+});
+
+document.querySelectorAll(".f-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".f-chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    currentFilter = chip.dataset.filter;
+    applyFilters();
+  });
+});
+
+// ── PANEL CONTROLS ─────────────────────────────────────────────────────────
+const overlay = document.getElementById("overlay");
+const panel = document.getElementById("panel");
+const addBtn = document.getElementById("addProductBtn");
+const closeBtn = document.getElementById("panelClose");
+const cancelBtn = document.getElementById("panelCancel");
+const saveBtn = document.getElementById("panelSave");
+
+function openPanel() { overlay.classList.add("show"); panel.classList.add("show"); document.body.style.overflow = "hidden"; }
+function closePanel() { overlay.classList.remove("show"); panel.classList.remove("show"); document.body.style.overflow = ""; }
+
+addBtn.addEventListener("click", openPanel);
+closeBtn.addEventListener("click", closePanel);
+cancelBtn.addEventListener("click", closePanel);
+overlay.addEventListener("click", closePanel);
+
+// ── SAVE PRODUCT ───────────────────────────────────────────────────────────
+saveBtn.addEventListener("click", async () => {
+  const name = document.getElementById("prodName").value.trim();
+  const category = document.getElementById("prodCategory").value;
+  const barcode = document.getElementById("prodBarcode").value.trim();
+  const selling_price = parseFloat(document.getElementById("prodPrice").value) || 0;
+  const cost_price = parseFloat(document.getElementById("prodCost").value) || 0;
+  const opening_stock = parseInt(document.getElementById("prodStock").value) || 0;
+  const reorder_level = parseInt(document.getElementById("prodReorder").value) || 5;
+  const gst_rate = parseFloat(document.getElementById("prodGst").value) || 5;
+  const expiry_date = document.getElementById("prodExpiry").value || null;
+
+  if (!name || !category || !selling_price) {
+    alert("Please fill in Name, Category, and Selling Price.");
+    return;
+  }
+
+  saveBtn.textContent = "Saving...";
+  saveBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/products`, {
+      method: "POST", headers: hdrs(),
+      body: JSON.stringify({ name, category, barcode: barcode || null, selling_price, cost_price, opening_stock, reorder_level, gst_rate, expiry_date }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.detail || "Failed to save product."); return; }
+    closePanel();
+    // Clear form
+    ["prodName","prodBarcode","prodPrice","prodCost","prodStock","prodReorder","prodExpiry"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("prodCategory").value = "";
+    await loadProducts();
+    await loadStats();
+  } catch(e) { alert("Server error. Try again."); }
+  finally { saveBtn.innerHTML = '<i class="ti ti-check"></i> Save product'; saveBtn.disabled = false; }
+});
+
+// ── STOCK IN ───────────────────────────────────────────────────────────────
+window.openStockIn = function(productId, name) {
+  const qty = prompt(`Add stock for "${name}"\n\nHow many units received?`);
+  if (!qty || isNaN(parseInt(qty))) return;
+  fetch(`${API}/inventory/stock-in`, {
+    method: "POST", headers: hdrs(),
+    body: JSON.stringify({ product_id: productId, quantity: parseInt(qty), note: "Manual stock in" }),
+  }).then(r => r.json()).then(data => {
+    if (data.new_stock !== undefined) {
+      alert(`Stock updated! ${name} now has ${data.new_stock} units.`);
+      loadProducts(); loadStats();
+    } else { alert(data.detail || "Failed"); }
+  }).catch(() => alert("Server error"));
+};
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
+loadStats();
+loadProducts();
+
+(function(){
+  const t = localStorage.getItem("token");
+  if (!t) return;
+  fetch("http://127.0.0.1:8000/api/v1/auth/me", {
+    headers: { "Authorization": "Bearer " + t }
+  }).then(r => r.json()).then(d => {
+    const nameEl = document.querySelector(".sb-user-name");
+    const shopEl = document.querySelector(".sb-user-shop");
+    const avEl   = document.querySelector(".sb-avatar");
+    if (nameEl) nameEl.textContent = d.name;
+    if (shopEl) shopEl.textContent = d.store_name;
+    if (avEl)   avEl.textContent   = d.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+  }).catch(()=>{});
+})();
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a14b9d7ebac18001',t:'MTc4Mjk3Mzk2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

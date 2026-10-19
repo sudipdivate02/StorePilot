@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePilot — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<style>
+:root{
+  --sp9:#0C3326;--sp8:#0F3D2E;--sp7:#155E45;--sp5:#1E8A63;--sp0:#EBF6F1;
+  --g5:#F5A623;--g4:#F7BB5A;--g0:#FEF3DC;
+  --ivory:#F7F4EE;
+  --txt:#1A1A1A;--txt2:#6B7280;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background-color:var(--ivory);
+  min-height:100vh;
+  display:flex;
+  overflow-x:hidden;
+}
+
+/* ─────────────────────────────
+   SPLIT VIEWPORT LAYOUT (Option 1)
+───────────────────────────── */
+.page{
+  display:flex;
+  width:100vw;
+  min-height:100vh;
+  animation: pageReveal 0.8s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes pageReveal{
+  0%  {opacity:0;transform:translateX(-10px);}
+  100%{opacity:1;transform:translateX(0);}
+}
+
+/* ─────────────────────────────
+   LEFT PANEL (Immersive Brand Panel)
+───────────────────────────── */
+.left{
+  width:45%;
+  max-width:600px;
+  min-width:440px;
+  flex-shrink:0;
+  background: linear-gradient(135deg, var(--sp9) 0%, var(--sp8) 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:64px 48px;
+  position:relative;
+  overflow:hidden;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Premium micro-dot grid overlay */
+.left::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(255,255,255,0.035) 1.2px, transparent 1.2px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+
+/* Catchy fluid geometric art layer using brand colors */
+.left::after{
+  content:'';position:absolute;
+  bottom:-50px;
+  right:-50px;
+  width:320px;
+  height:320px;
+  border-radius:50%;
+  background: radial-gradient(circle, transparent 40%, rgba(245,166,35,0.04) 100%);
+  border: 2px dashed rgba(245,166,35,0.08);
+  pointer-events:none;
+}
+
+.dec-ring {
+  position:absolute;
+  top:-80px;
+  left:-80px;
+  width:280px;
+  height:280px;
+  border-radius:40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: linear-gradient(45deg, rgba(30,138,99,0.06), transparent);
+  animation: fluidRotate 20s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes fluidRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.left-inner{position:relative;z-index:1;text-align:center;width:100%;}
+
+/* ── logo pill ── */
+.logo-pill{
+  display:inline-flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px;
+  padding:12px 24px 12px 12px;
+  margin-bottom:40px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(12,51,38,0.2);
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+}
+
+.logo-img-box{
+  width:54px;height:54px;
+  background: rgba(255,255,255,0.04);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.logo-img-box img{
+  width:46px;height:46px;
+  object-fit:contain;
+  display:block;
+}
+
+.pill-text{text-align:left;}
+.pill-name{
+  font-size:22px;font-weight:900;
+  color:#fff;letter-spacing:-0.5px;line-height:1;
+}
+.pill-name span{color:var(--g4);}
+.pill-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:4px;letter-spacing:0.06em;text-transform:uppercase;}
+
+/* ── headline ── */
+.left-hl{
+  font-size:28px;font-weight:800;color:#fff;
+  line-height:1.3;letter-spacing:-0.5px;
+  margin-bottom:12px;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+}
+.left-hl em{color:var(--g4);font-style:normal;}
+
+.left-body{
+  font-size:14px;color:rgba(255,255,255,0.45);
+  line-height:1.7;margin-bottom:44px;
+  max-width:340px;
+  margin-left:auto;
+  margin-right:auto;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.3s both;
+}
+
+/* ── feature pills ── */
+.feats{display:flex;flex-direction:column;gap:12px;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+}
+.feat{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:14px;padding:14px 16px;text-align:left;
+  transition: background 0.3s, border-color 0.3s;
+}
+.feat:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+.feat-ico{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:rgba(245,166,35,0.12);
+  border:0.5px solid rgba(245,166,35,0.22);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--g4);font-size:18px;
+}
+.feat-t{font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);line-height:1.2;}
+.feat-d{font-size:11px;color:rgba(255,255,255,0.38);margin-top:3px;}
+
+@keyframes fadeUp{
+  0%  {opacity:0;transform:translateY(12px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+/* ─────────────────────────────
+   RIGHT PANEL (Crisp Form Workspace)
+───────────────────────────── */
+.right{
+  flex:1;
+  background-color:var(--ivory);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:64px;
+  position:relative;
+}
+
+/* Elegant geometric background grid on the right panel */
+.right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 85% 15%, rgba(245,166,35,0.04) 0%, transparent 40%),
+    radial-gradient(rgba(15,61,46,0.02) 1px, transparent 1px);
+  background-size: auto, 32px 32px;
+  pointer-events: none;
+}
+
+/* Centered Form Envelope Module */
+.form-box {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  padding: 44px 40px;
+  border-radius: 24px;
+  border: 1px solid rgba(15,61,46,0.06);
+  box-shadow: 
+    0 20px 50px rgba(12,51,38,0.04),
+    0 4px 12px rgba(12,51,38,0.02);
+  position: relative;
+  z-index: 2;
+  animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.15s both;
+}
+
+.eyebrow{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:800;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--sp5);
+  margin-bottom:10px;
+}
+.eyebrow-line{width:24px;height:3px;border-radius:2px;background:var(--g5);}
+
+.form-h{
+  font-size:32px;font-weight:900;
+  color:var(--sp9);letter-spacing:-0.8px;
+  margin-bottom:8px;line-height:1.1;
+}
+.form-s{
+  font-size:14px;color:var(--txt2);
+  margin-bottom:32px;line-height:1.6;
+}
+
+/* ── fields ── */
+.field{margin-bottom:20px;}
+.f-label{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--txt);margin-bottom:8px;
+}
+.f-wrap{position:relative;display:flex;align-items:center;}
+.f-icon{
+  position:absolute;left:16px;
+  color:var(--txt2);font-size:18px;pointer-events:none;
+}
+.f-prefix{
+  position:absolute;left:46px;
+  font-size:14px;font-weight:700;color:#9CA3AF;
+  pointer-events:none;letter-spacing:0.01em;
+}
+.f-wrap input{
+  width:100%;height:54px;
+  border:1.5px solid #E5E7EB;border-radius:14px;
+  padding:0 16px 0 48px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:14.5px;font-weight:600;color:var(--txt);
+  background:#FAFAFA;outline:none;
+  transition:border-color 0.18s,background 0.18s,box-shadow 0.18s;
+}
+.phone-in{padding-left:86px!important;}
+.f-wrap input::placeholder{color:#C5CAD3;font-size:13.5px;font-weight:400;}
+.f-wrap input:focus{
+  border-color:var(--sp5);background:#fff;
+  box-shadow:0 0 0 4px rgba(30,138,99,0.08);
+}
+.f-wrap input.err{border-color:#FCA5A5;background:#FFF9F9;}
+.f-eye{
+  position:absolute;right:16px;
+  color:var(--txt2);font-size:18px;
+  cursor:pointer;background:none;border:none;padding:0;
+  display:flex;align-items:center;transition:color 0.15s;
+}
+.f-eye:hover{color:var(--sp7);}
+
+/* forgot */
+.forgot-row{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:24px;}
+.forgot{font-size:12.5px;color:var(--sp5);font-weight:700;text-decoration:none;}
+.forgot:hover{color:var(--sp7);text-decoration:underline;}
+
+/* ── button ── */
+.btn-go{
+  width:100%;height:54px;border-radius:14px;
+  background:var(--sp8);color:#fff;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:15px;font-weight:800;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  letter-spacing:0.02em;
+  box-shadow:0 6px 20px rgba(15,61,46,0.22);
+  margin-bottom:24px;
+  position:relative;overflow:hidden;
+  transition:background 0.18s,transform 0.12s,box-shadow 0.18s;
+}
+.btn-go::after{
+  content:'';position:absolute;
+  top:0;left:-100%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
+  transform:skewX(-18deg);transition:none;
+}
+.btn-go:hover{background:var(--sp7);box-shadow:0 8px 28px rgba(15,61,46,0.28);}
+.btn-go:hover::after{left:150%;transition:left 0.55s ease;}
+.btn-go:active{transform:scale(0.98);}
+.btn-go.loading{background:var(--sp7);pointer-events:none;}
+.spinner{
+  width:20px;height:20px;
+  border:2.5px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin 0.7s linear infinite;display:none;
+}
+.btn-go.loading .spinner{display:block;}
+.btn-go.loading .btn-txt{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── or / register ── */
+.or-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.or-line{flex:1;height:1px;background:#F0F0F0;}
+.or-txt{font-size:11px;color:#C8CDD5;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+
+.reg-row{text-align:center;font-size:13.5px;color:var(--txt2);}
+.reg-a{color:var(--sp5);font-weight:800;text-decoration:none;}
+.reg-a:hover{color:var(--sp7);text-decoration:underline;}
+
+/* trust row */
+.trust{
+  display:flex;align-items:center;justify-content:center;
+  gap:20px;margin-top:32px;padding-top:24px;
+  border-top:1px solid #F3F4F6;
+  width:100%;
+}
+.trust-i{display:flex;align-items:center;gap:5px;font-size:11px;color:#B4BCC7;font-weight:500;}
+.trust-i i{font-size:13px;color:#9CA3AF;}
+
+/* error */
+.err-box{
+  display:none;align-items:center;gap:10px;
+  background:#FEF2F2;border:1px solid #FECACA;
+  border-radius:12px;padding:12px 16px;
+  margin-bottom:20px;
+  font-size:13.5px;color:#DC2626;font-weight:700;
+}
+.err-box.show{display:flex;}
+
+/* ─────────────────────────────
+   RESPONSIVE STATES
+───────────────────────────── */
+@media(max-width:900px){
+  .left{width:40%;min-width:360px;padding:44px 32px;}
+  .left-hl{font-size:24px;}
+  .left-body{font-size:13px;margin-bottom:32px;}
+  .logo-pill{margin-bottom:32px;}
+}
+
+@media(max-width:768px){
+  body{overflow-y:auto;}
+  .page{flex-direction:column;min-height:100vh;width:100%;}
+  .left{width:100%;max-width:100%;min-width:100%;padding:44px 24px 36px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .feats,.left-body{display:none;}
+  .right{padding:32px 16px;flex:none;min-height:auto;}
+  .form-box{padding:32px 24px;box-shadow:none;border:none;background:transparent;}
+  .trust{margin-top:16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="page" role="main">
+
+  <div class="left">
+    <div class="dec-ring"></div>
+    <div class="left-inner">
+
+      <div class="logo-pill">
+        <div class="logo-img-box">
+          <img src="SPlogo.png" alt="StorePilot Logo">
+        </div>
+        <div class="pill-text">
+          <div class="pill-name">Store<span>Pilot</span></div>
+          <div class="pill-sub">Kirana Business OS</div>
+        </div>
+      </div>
+
+      <div class="left-hl">Your shop.<br><em>Smarter every day.</em></div>
+      <div class="left-body">Billing, inventory, udhar, AI predictions — everything your kirana needs, in one place.</div>
+
+      <div class="feats">
+        <div class="feat">
+          <div class="feat-ico"><i class="ti ti-receipt" aria-hidden="true"></i></div>
+          <div>
+            <div class="feat-t">GST billing in 60 seconds</div>
+            <div class="feat-d">Scan barcode → bill done</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico"><i class="ti ti-notebook" aria-hidden="true"></i></div>
+          <div>
+            <div class="feat-t">Digital bahi-khata</div>
+            <div class="feat-d">Udhar tracked, reminders sent auto</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico"><i class="ti ti-bulb" aria-hidden="true"></i></div>
+          <div>
+            <div class="feat-t">AI demand prediction</div>
+            <div class="feat-d">Know what to stock before festivals</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico"><i class="ti ti-package" aria-hidden="true"></i></div>
+          <div>
+            <div class="feat-t">Smart inventory</div>
+            <div class="feat-d">Expiry and low stock alerts auto</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="right">
+
+    <div class="form-box">
+      <div class="eyebrow"><div class="eyebrow-line"></div> Welcome back</div>
+      <div class="form-h">Login to your shop</div>
+      <div class="form-s">Enter your phone number and password to continue.</div>
+
+      <div class="err-box" id="errBox" role="alert">
+        <i class="ti ti-alert-circle" aria-hidden="true"></i>
+        <span id="errTxt">Phone number or password is wrong. Please try again.</span>
+      </div>
+
+      <form id="loginForm" novalidate>
+
+        <div class="field">
+          <label class="f-label" for="phone">Phone number</label>
+          <div class="f-wrap">
+            <i class="ti ti-phone f-icon" aria-hidden="true"></i>
+            <span class="f-prefix">+91</span>
+            <input type="tel" id="phone" class="phone-in"
+              placeholder="98765 43210" maxlength="10" inputmode="numeric" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="f-label" for="password">Password</label>
+          <div class="f-wrap">
+            <i class="ti ti-lock f-icon" aria-hidden="true"></i>
+            <input type="password" id="password"
+              placeholder="Enter your password" autocomplete="current-password">
+            <button type="button" class="f-eye" id="eyeBtn" aria-label="Show or hide password">
+              <i class="ti ti-eye" id="eyeIco" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="forgot-row">
+          <a href="forgot-password.html" class="forgot">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-go" id="loginBtn">
+          <div class="spinner" aria-hidden="true"></div>
+          <span class="btn-txt">
+            <i class="ti ti-login" aria-hidden="true"></i>&nbsp; Login to StorePilot
+          </span>
+        </button>
+
+      </form>
+
+      <div class="or-row">
+        <div class="or-line"></div>
+        <div class="or-txt">New here?</div>
+        <div class="or-line"></div>
+      </div>
+
+      <div class="reg-row">
+        No account yet? &nbsp;<a href="register.html" class="reg-a">Register your shop &rarr;</a>
+      </div>
+
+      <div class="trust">
+        <div class="trust-i"><i class="ti ti-lock" aria-hidden="true"></i> Secure</div>
+        <div class="trust-i"><i class="ti ti-shield-check" aria-hidden="true"></i> Private</div>
+        <div class="trust-i"><i class="ti ti-device-mobile" aria-hidden="true"></i> Mobile friendly</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000/api/v1";
+
+  const phoneEl = document.getElementById('phone');
+  const passEl  = document.getElementById('password');
+  const btn     = document.getElementById('loginBtn');
+  const errBox  = document.getElementById('errBox');
+  const errTxt  = document.getElementById('errTxt');
+  const eyeBtn  = document.getElementById('eyeBtn');
+  const eyeIco  = document.getElementById('eyeIco');
+
+  // If already logged in, skip straight to billing
+  // Clear any stale/expired token when landing on login page
+  localStorage.removeItem('token');
+
+  phoneEl.addEventListener('input', () => {
+    phoneEl.value = phoneEl.value.replace(/\D/g,'').slice(0,10);
+    phoneEl.classList.remove('err'); errBox.classList.remove('show');
+  });
+  passEl.addEventListener('input', () => {
+    passEl.classList.remove('err'); errBox.classList.remove('show');
+  });
+
+  eyeBtn.addEventListener('click', () => {
+    const hide = passEl.type === 'password';
+    passEl.type = hide ? 'text' : 'password';
+    eyeIco.className = hide ? 'ti ti-eye-off' : 'ti ti-eye';
+  });
+
+  function showErr(msg){
+    errTxt.textContent = msg;
+    errBox.classList.add('show');
+    btn.classList.remove('loading');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const phone = phoneEl.value.trim();
+    const pass  = passEl.value.trim();
+
+    if(!phone || phone.length < 10){
+      phoneEl.classList.add('err');
+      showErr('Please enter a valid 10-digit phone number.');
+      phoneEl.focus(); return;
+    }
+    if(!pass || pass.length < 4){
+      passEl.classList.add('err');
+      showErr('Please enter your password.');
+      passEl.focus(); return;
+    }
+
+    btn.classList.add('loading');
+    errBox.classList.remove('show');
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password: pass }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        phoneEl.classList.add('err');
+        passEl.classList.add('err');
+        showErr(data.detail || 'Phone number or password is wrong. Please try again.');
+        return;
+      }
+
+      // Save token and user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.role || '');
+      localStorage.setItem('store_id', data.store_id || '');
+
+      // Redirect to billing (main dashboard for cashiers)
+      window.location.href = 'billing.html';
+
+    } catch (err) {
+      showErr('Could not connect to server. Make sure the backend is running.');
+    } finally {
+      btn.classList.remove('loading');
+    }
+  });
+</script>
+</body>
+</html>
